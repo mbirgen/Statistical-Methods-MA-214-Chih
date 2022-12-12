@@ -1,0 +1,43 @@
+---
+title: "Section 1.1 Homework"
+output: html_notebook
+editor_options: 
+  markdown: 
+    wrap: sentence
+---
+
+1.   Suppose you want to know how Arizona workers age 16 or older travel to work. To estimate the percentage of people who use the different modes of travel, you take a sample containing 500 Arizona workers age 16 or older. State the individual, variable, population, sample, parameter, and statistic.
+
+2.  You wish to estimate the mean cholesterol levels of patients two days after they had a heart attack. To estimate the mean you collect data from 28 heart patients. State the individual, variable, population, sample, parameter, and statistic.
+
+3.  Print-O-Matic would like to estimate their mean salary of all employees. To accomplish this they collect the salary of 19 employees. State the individual, variable, population, sample, parameter, and statistic.
+
+4.  To estimate the percentage of households in Connecticut which use fuel oil as a heating source, a researcher collects information from 1000 Connecticut households about what fuel is their heating source. State the individual, variable, population, sample, parameter, and statistic.
+
+5.  The U.S. Census Bureau needs to estimate the median income of males in the U.S., they collect incomes from 2500 males. State the individual, variable, population, sample, parameter, and statistic.
+
+6.  The U.S. Census Bureau needs to estimate the median income of females in the U.S., they collect incomes from 3500 females. State the individual, variable, population, sample, parameter, and statistic.
+
+7.  Eyeglassmatic manufactures eyeglasses and they would like to know the percentage of each defect type made. They review 25,891 defects and classify each defect that is made. State the individual, variable, population, sample, parameter, and statistic.
+
+8.  The World Health Organization wishes to estimate the mean density of people per square kilometer, they collect data on 56 countries. State the individual, variable, population, sample, parameter, and statistic
+
+9.  State the measurement scale for each.
+
+    -   Cholesterol level
+
+    -   Defect type
+
+    -   Time of first class
+
+    -   Opinion on a 5 point scale, with 5 being strongly agree and 1 being strongly disagree
+
+10. State the measurement scale for each.
+
+    -   Temperature in degrees Celsius
+
+    -   Ice cream flavors available
+
+    -   Pain levels on a scale from 1 to 10, 10 being the worst pain ever
+
+    -   Salary of employees

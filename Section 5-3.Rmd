@@ -1,0 +1,233 @@
+---
+title: "Chi-Squared Test and Goodness of Fit"
+author: ""
+output: html_notebook
+---
+
+In previous sections, we discuss the proportion of a categorical variable which takes on a certain value. In this section, we look at the distribution of a sample of a categorical variable across all its values. In particular, we see if a sample can plausibly come from a given distribution for the variable.
+
+### Exploration 5.3.1. Racial Demographics and Jurors.  
+A small town is 70% White, 15% Black, 10% Hispanic and 5% Asian. In a random sample of 300 jurors from the town, we say that 237 were White, 26 were Black, 24 were Hispanic and 13 were Asian.
+
+(a) If you randomly selected 300 people from a town that is 70% White, 15% Black, 10% Hispanic and 5% Asian, what are the expected values for the number of White, Black, Hispanic and Asian people to be selected?
+```{r}
+smalltown = c(0.70, 0.15, 0.10, Fixme1)
+smalltown*300
+```
+
+(b) How do these numbers compare to the juror sample?
+
+(c) Run the following code to simulate selecting 300 random people from the town, and plotting a bar chart of the racial demographics.
+```{r, echo=FALSE}
+n=300
+town_samp=sample(c("WHITE", "BLACK", "HISPANIC", "ASIAN"), n, replace=TRUE, prob=c(0.7,0.15, 0.1, 0.05))
+barplot(table(town_samp))
+```
+
+
+(d) Run the following code to summarize the racial demographics of your simulated sample.
+```{r}
+table(town_samp)
+```
+
+How does these values compare to what you found in (a)? To the juror sample?
+
+There is a clear follow-up question to be asked here. “Does the jury pool match the demographics of the town?” Certainly, a random sample of 300 people need not match the expected demographics exactly. But the more it deviates from the town demographics, the less likely we are to be inclined to think that these demographics match.
+
+In the language of Hypothesis Testing, this section is focused on null and alternative hypothesis of the following form: Given a proposed distribution for a categorical variable...
+
+* \(H_0\):"The sample comes from the proposed distribution.”
+
+* \(H_A\):"The sample does not come from the proposed distribution.”
+
+## 5.3.1 The chi-square distribution
+
+In previous sections, we discuss the proportion of a categorical variable which takes on a certain value. In this section, we look at the distribution of a sample of a categorical variable across all its values. In particular, we see if a sample can plausibly come from a given distribution for the variable.
+
+The work we are doing in this section is designed to help you understand where the \(\chi^2\) distribution is coming from. In practice we use R to calculate this behind the scenes.
+
+So suppose we did assume the null hypothesis that a sample comes from a certain distribution. We essentially want to develop a measure of how far this sample deviates from the proposed distribution. If that measure is small, it's plausible it may come from the null distribution. If the measure is a significant deviation, we reject the idea that this is the distribution from where the sample comes.
+Suppose that we did have a random variable with \(k\) possible outcomes: \(O_1, O_2, \dots O_k\), and a sample with \(n_1, n_2, \dots n_k\) data points corresponding to each outcome. Note that the total size of the sample is \(n=n_1+n_2+\cdots+n_k\). Let \(E_1,E_2,\dots, E_k\) denote the expected number of outcomes for each value, if a sample of size \(n\) were taken from the proposed distribution.
+We then compute the test statistic for the \(i\)th value is
+\[ Z_i=\frac{(n_i-E_i)^2}{E_i}\]
+ 
+Then we compute
+\[ \chi^2 = Z_1^2+\cdots Z_k^2 = \frac{(n_1-E_1)^2}{E_1}+\frac{(n_2-E_2)^2}{E_2}+\cdots+\frac{(n_k-E_k)^2}{E_k}\]
+This removes the distinction between over and undershooting the expectations, and sums the adjusted error for all the values, which gives a measure for the “total” deviation from the theoretical expectation.
+
+### Activity 5.3.2. Racial Demographics and Jurors: \(Z\) and \(\chi^2\) Statistics.  
+
+Recall from Exploration 5.3.1 that we have a sample of size \(n=300\) where 237 are White, 26 are Black, 24 are Hispanic and 13 are Asian. We also have a proposed distribution: 70% White, 15% Black, 10% Hispanic and 5% Asian.
+
+(a) Recall that \(n_1=237\) White jurors in the sample, let \(E_1\) denote the expected number of White jurors found in Exploration 5.3.1 (a). Compute \(Z_1\)
+```{r}
+E_1 = 300*smalltown[1]
+Z_1 = (237-E_1)^2/E_1
+Z_1
+```
+
+(b) Recall that \(n_2=26\) Black jurors in the sample, let \(E_2\) denote the expected number of Black jurors found in Exploration 5.3.1 (a). Compute \(Z_2\).
+```{r}
+E_2 = 300*smalltown[2]
+Z_2 = (26-E_2)^2/E_2
+Z_2
+```
+
+(c) Recall that \(n_3=24\) Hispanic jurors in the sample, let \(E_3\) denote the expected number of Hispanic jurors found in Exploration 5.3.1 (a). Compute \(Z_3\).
+```{r}
+E_3 = 300*FIXME
+Z_3 = (FIXME-E_3)^2/E_3
+Z_3
+```
+
+(d) Recall that \(n_4=13\) Asian jurors in the sample, let \(E_4\) denote the expected number of Asian jurors found in Exploration 5.3.1 (a). Compute \(Z_4\)
+```{r}
+
+```
+
+(e) Now compute \(\chi^2= Z_1^2+\cdots Z_k^2\).
+```{r}
+chi2 = Z_1+Z_2+Z_3+Z_4
+chi2
+```
+
+## Hypothesis Testing and \(\chi^2\)
+
+### Remark 5.3.2. Steps to  Hypothesis Testing: Goodness of Fit.  
+Given the set of hypothesis:
+
+* \(H_0\):"The sample comes from the proposed distribution.”
+
+* \(H_A\):"The sample does not come from the proposed distribution.”
+
+We compute the \(p\)-value to be the area of the tail on the  distribution corresponding to the \(\chi^2\) value computed via Remark 5.3.1 and with \(k-1\) degrees of freedom (recall that \(k\) is the number of possible values of the categorical variable.)
+
+As in other hypothesis testing scenarios, the \(p\)-value measures the probability that, if we assume the null hypothesis, that we see values as or more extreme than what was observed.
+
+We then reject or accept the null based on the level of significance \(\alpha\) which is as before usually 0.05 or 5%. If the -value is less than , we reject the null hypothesis, otherwise we accept it. In this context, accepting the null is to say the sample could plausibly come from the proposed distribution. If we reject that then we say it is implausible that it does.
+
+### Activity 5.3.4. Racial Demographics and Jurors. 
+Recall from Activity 5.3.2 that we have a sample of size \(n=300\) where 237 are White, 26 are Black, 24 are Hispanic and 13 are Asian. We also have a proposed distribution: 70% White, 15% Black, 10% Hispanic and 5% Asian.
+We also note that since each juror could be one of 4 races, that \(k=4\).
+
+(a) Compute the number of degrees of freedom.
+
+(b) Using the \(\chi^2\) value found in Activity 5.3.2 and the degrees of freedom, compute the \(p\)-value.
+
+```{r}
+pchisq(chi2, FIXME, ncp = 0, lower.tail = FALSE)
+```
+
+(c) State the meaning of the \(p\)-value within the context of this problem in a complete sentence.
+>
+
+(d) If we had a level of significance \(\alpha = 0.05\), do we reject the null hypothesis?
+
+(e) Is it plausible that the juror racial demographics is identical to that of the town?
+>
+
+### Activity 5.3.5. \(\chi^2\)-testing with Technology. 
+Your main task as a statistics practitioner is to understand and interpret the results of computation. We prefer to let machines do the actual computations as much as possible. Here we will use technology to simplify the process of computing \(p\)-values.
+
+(a) Run the following code, noting the first vector is the vector of racial demographics, and the second vector is the proposed distribution, to compute a \(p\)-value.
+```{r}
+chisq.test(c(237,26,24,13), p = c(0.7, 0.15, 0.1, 0.05), correct=FALSE)
+```
+
+What is the \(p\)-value? How does it compare to what you found in Activity 5.3.4?
+>
+
+### Activity 5.3.6. Skittle Color Distributions. 
+Skittles come in 5 colors. Red, Green, Orange, Purple and Yellow. Are the Skittle colors evenly distributed? One of your friends says yes, another disagrees.
+
+(a) State a null hypothesis for this \(\chi \) test.
+>
+
+(b) State an alternative hypothesis for this \(\chi \) test.
+>
+
+(c) Suppose that you then buy a bag of Skittles, dump it out and count the contents.
+
+| Color | Red | Green | Yellow | Purple | Orange |
+|:-----:|:---:|:-----:|:------:|:------:|:------:|
+| Count |  18 |   13  |    9   |   11   |    9   |
+
+How many Skittles \(n\) are in the bag? How many colors \(k\)? How many degrees of freedom are there?
+
+(d) If the null hypothesis were true, what is the expected number of skittles of each color in a sample of size ?
+(e) Use any method to compute a \(\chi^2\) statistic.
+```{r}
+
+```
+
+
+(f) Use any method to compute a \(p\)-value.
+```{r}
+
+```
+
+(g) State the meaning of the \(p\)-value within the context of this problem in a complete sentence.
+
+(h) If we had a level of significance \(\alpha = 0.05\) do we reject the null hypothesis?
+
+(i) Is it plausible for Skittle colors to be evenly distributed?
+
+### Activity 5.3.7. Male Heights and Normal Distribution.  
+We examine data from a random selection of adult males to see if their heights are possibly normally distributed.
+Run the following code to download the male_heights.csv data set and to display it's variables.
+```{r}
+male_heights = read.csv("https://github.com/TienChih/tbil-stats/raw/main/data/male_heights.csv")
+names(male_heights)
+```
+
+(a) We begin by examining the heights of adult males in inches. Run the following code to see the sample mean and standard deviation for the heights of adult males in inches, and set them to be `m` and `std` respectively.
+```{r}
+m=mean(male_heights$heights)
+std=sd(male_heights$heights)
+print(m)
+print(std)
+```
+
+(b) IF adult male heights were normally distributed, we would expect it to be approximated by a normal random variable \(X\) with mean \(\mu = m\) and standard deviation \(\sigma = std\). Confirm that if we subdivide a normal distribution into intervals of length \(std\), we would have:
+\[P(X<m-3std)\approx 0.0014\]
+\[P(m-3std\leq X<m-2std)\approx 0.0214\]
+\[P(m-2std\leq X<m-std)\approx 0.1359\]
+\[P(m-std\leq X<m)\approx 0.3413\]
+\[P(m\leq X<m+std)\approx 0.3413\]
+\[P(m+std\leq X<m+2std)\approx 0.1359\]
+\[P(m+2std\leq X<m+3std)\approx 0.0214\]
+\[P(X\geq m+3std)\approx 0.0014\]
+
+(c) Run the following code to compute the actual number of adult males were less than  inches.
+```{r}
+length(which(m-3*std>male_heights$heights))
+```
+
+(d) Run the following code to compute the actual number of adult males whose heights were between  inches.
+```{r}
+length(which(male_heights$heights>=m-3*std & m-2*std>male_heights$heights))
+```
+
+(e) Edit and run the above code for the remaining intervals, and record the number of adult males within them.
+
+(f) Edit and run the following code to run the  goodness of fit test to see if the number of occurrences in each interval corresponds to the theoretical value.
+```{r}
+chisq.test(c(FIXME, FIXME, FIXME, FIXME, FIXME, FIXME, FIXME, FIXME), p=c(0.0014, 0.0214, 0.1359, 0.3413, 0.3413, 0.1359, 0.0214, 0.0014), correct=FALSE)
+```
+
+(g) State a null hypothesis for this  test.
+
+(h) State an alternative hypothesis for this  test.
+
+(i) State the meaning of the -value within the context of this problem in a complete sentence.
+
+(j) If we had a level of significance  do we reject the null hypothesis?
+
+(k) Is it plausible for adult male heights to be normally distributed?
+
+(l) Run the following code to plot a histogram of the adult male heights in inches and see how well a normal distribution matches this distribution.
+```{r}
+hist(male_heights$heights, prob=TRUE, breaks=15)
+curve(dnorm(x, mean=m, sd=std), col="darkblue", lwd=2, add=TRUE, yaxt="n")
+```
+

@@ -1,0 +1,131 @@
+---
+title: "MultiLinear Regression"
+author: ""
+output: html_notebook
+---
+In the last sections we learned how to fit a line to two sets of data, one explanatory variable and one response variable. In this section we will fit a response variable to multiple explanatory variables/.
+
+## Subsection 7.4.1 The Setup for Multilinear Regression
+
+Here we will fit a multi-variable linear function to a response variable.
+
+### Exploration 7.4.1 Our Friend the Opposum
+
+Load the data: 
+Run the following code to download the `possum.csv` data set which contains information about 104 possums, and various attributes of the possums: 
+```{r}
+possum = read.csv("https://github.com/TienChih/tbil-stats/raw/main/data/possum.csv")
+
+names(possum)
+```
+
+In previous sections we predicted the head length as a function of the skull width.  Here we will predict the total length of the possum as a function of the head length, the tail length and the skull width. We will then ask ourselves the question "Can we do just as good with fewer variables.
+
+(a) Look at the prediction of the `total_l` as a function of `skull_w`
+```{r}
+skulltotalmod = lm(total_l ~ skull_w, data = possum)
+summary(skulltotalmod)
+```
+
+What proportion of the total length is determined by the skull width?
+What is the p-value for the null hypothesis that the slope is zero?
+
+
+(b) Run the following code to plot the scatterplot and the least squares line. 
+```{r}
+plot(possum$skull_w, possum$total_l,  pch=19)
+abline(skulltotalmod, col="red")
+```
+
+(c) Look at the prediction of the `total_l` as a function of `head_l`
+```{r}
+headtotalmod = lm(total_l ~ head_l, data = possum)
+summary(headtotalmod)
+```
+
+What proportion of the total length is determined by the head length?
+What is the p-value for the null hypothesis that the slope is zero?
+
+
+(d) Run the following code to plot the scatterplot and the least squares line. 
+```{r}
+plot(possum$head_l, possum$total_l,  pch=19)
+abline(headtotalmod, col="red")
+```
+
+(e) Look at the prediction of the `total_l` as a function of `tail_l`
+```{r}
+tailtotalmod = lm(total_l ~ tail_l, data = possum)
+summary(tailtotalmod)
+```
+
+What proportion of the total length is determined by the tail length?
+What is the p-value for the null hypothesis that the slope is zero?
+
+
+(f) Run the following code to plot the scatterplot and the least squares line. 
+```{r}
+plot(possum$tail_l, possum$total_l,  pch=19)
+abline(tailtotalmod, col="red")
+```
+
+### Exploration 7.4.2
+
+(a) Run the following code to create a model for `total_l` as a function of `skull_w`, `head_l`, and `tail_l`.
+```{r}
+fullmod = lm(total_l ~ skull_w + head_l + tail_l, data = possum)
+summary(fullmod)
+```
+Notice now that there are three slopes, one that gets multiplied by `skull_w`, one that gets multiplied by `head_l`, and one that gets multiplied by `tail_l`.
+
+One interpretation of these slopes is that they give you the change in your response variable if you hold all the other variables constant. This is one way to test for statistical significance in messy data where you want to control for other variables.
+
+(b) Overall, what proportion of the total length can be explained by a combination of our three variables?
+
+(c)
+What is the p-value for the null hypothesis that the slope for `skull_w` is zero? What is the p-value for the null hypothesis that the slope for `head_l` is zero? What is the p-value for the null hypothesis that the slope for `tail_l` is zero?
+
+(d) If you wanted to simplify your model and throw out one of your variables, which one would you get rid of and why?
+
+(e) Fix the following model so that you have thrown out that variable.
+```{r}
+simplermod = lm(total_l ~ FIXME1 + FIXME2, data = possum)
+summary(simplermod)
+```
+
+(f) Overall, what proportion of the total length can be explained by a combination of our two variables? Compare that to your previous answer for three variables.
+
+(g)
+What is the p-value for the null hypothesis that the slope for variable1 is zero? What is the p-value for the null hypothesis that the slope for variable2 is zero? 
+
+(h) Now switch your two explanatory variables and create a new model.
+```{r}
+simplermod2 = lm(total_l ~ FIXME2 + FIXME1, data = possum)
+summary(simplermod2)
+```
+
+Compare this summary from the one before. Does anything change? Does it matter the order you put in your variables in the model?
+
+### Exploration 7.4.3 Quiz Data
+
+Load the data: 
+Run the following code to download the `possum.csv` data set which contains information about 104 possums, and various attributes of the possums: 
+```{r}
+quiz6 = read.csv("https://raw.githubusercontent.com/mbirgen/Test/master/Quiz6.csv", sep = ",")
+
+names(quiz6)
+```
+
+(a) Create a multilinear model using all the homework sets as explanatory variables and Quiz as the response variable
+```{r}
+quizmod = lm(Quiz ~ Homework1 + Homework2 + Homework3 + Homework4 + Homework5 + Homework6 , data = quiz6)
+summary(quizmod)
+```
+
+(b) Remove the coefficient that has the highest probability of belonging to the null hypothesis and run again.  Continue doing this until all your slopes have p-values less than .05.
+```{r}
+
+```
+
+What do you notice? What would that indicate to you?
+

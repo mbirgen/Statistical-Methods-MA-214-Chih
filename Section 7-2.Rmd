@@ -1,0 +1,255 @@
+---
+title: "Section 7.2 Interpreting Linear Regression (R2)"
+author: ""
+output: html_notebook
+---
+ 
+We've shown how to perform linear regression in Section 7.1. In this section, we look at what the regression is telling us, what information we can draw from this analysis, and what we can't draw.
+
+## Subsection 7.2.1 Utilizing Regression Results 
+
+### Remark 7.2.1. 
+
+When modeling the relationship between two variables with a function (such as a linear function), the input (typically \(x\) values) is called the explanatory variable and the output (typically \(y\) values) is called the response variable.
+
+The idea is that one can measure the change in \(y\) as a response to changes in \(x\).
+### Exploration 7.2.1. Possums Again. 
+Recall from Exploration 7.1.1 and Activity 7.1.7 that the “head length of possums in mm” (response variable \(y\)) as a linear function of the “skull width of possums in mm” (explanatory variable \(x\)) has regression line
+$ y\approx 0.8158x+46.1954 $
+with correlation coefficient \(R\approx 0.7108, R^2\approx 0.5053.\)
+
+Run the following cell to re-compute these values: 
+```{r}
+possum = read.csv("https://github.com/TienChih/tbil-stats/raw/main/data/possum.csv")
+possummod=lm(head_l~skull_w, data=possum)
+print(possummod)
+print(cor(possum$skull_w, possum$head_l))
+plot(possum$skull_w, possum$head_l,  pch=19)
+abline(possummod, col="red")
+```
+
+Click here to learn more about this data set: https://www.openintro.org/data/index.php?data=possum
+
+(a)
+How would you describe the relationship between skull width and head length? (Strong, Moderate or Weak? Positive, Negative or None?)
+
+(b)
+What proportion of the head length is explained by skull width? (See Remark 7.1.20)
+
+(c)
+For a possum with skull width 53mm, what is the predicted head length? (Is skull width the explanatory or response variable?)
+```{r}
+possummod$coefficients[2]*53 + possummod$coefficients[1]
+```
+
+(d)
+For a possum with skull width 62mm, what is the predicted head length? (Is skull width the explanatory or response variable?)
+```{r}
+
+```
+
+(e)
+For a possum with head length 92mm, what skull width predicts this head length? (Is head length the explanatory or response variable?)
+```{r}
+(92-possummod$coefficients[1])/possummod$coefficients[2]
+```
+
+(f)
+Given that the slope $\beta_1=\frac{\Delta x}{\Delta y}$ what are the units of $\beta_1$ in this problem?
+
+(g)
+If the skull width of a possum is increased by 1mm, what is the predicted change in head length?
+
+### Remark 7.2.2. 
+Since the slope of a line $\beta_1$ is measured by the change in $y$ over change in $x$, the units of the slope are:
+$ \frac{\text{units of}\ y}{\text{units of}\ x} $
+and each increase in $x$ by one unit results in a change of $y$ by $\beta_1$ units.
+
+### Activity 7.2.2. Car Dealership. 
+A car salesmen analysis the cars he sold in the past year, how much he sold them for, and their age.
+
+| Car Age (in years) 	| Sell Price (in dollars) 	|
+|:------------------:	|:-----------------------:	|
+|          4         	|           6300          	|
+|          4         	|           5800          	|
+|          5         	|           5700          	|
+|          7         	|           4500          	|
+|          7         	|           4200          	|
+|          8         	|           4100          	|
+|          9         	|           3100          	|
+|         10         	|           6300          	|
+|         11         	|           2500          	|
+|         12         	|           2200          	|
+
+
+(a)
+Letting “Car Age” be the explanatory variable and “Sell Price” the response variable, enter the data into the columns x_1, y_1: 
+```{r}
+Car_Age = c(4, 4, 5, 7, 7, 8, 9, 10, 11, 12)
+Sell_Price = c(6300, 5800, 5700, 4500, 4200, 4100, 3100, 6300, 2500, 2200)
+plot(Car_Age, Sell_Price)
+```
+
+(b)
+What is \(R\)? What does it tell you about the relationship between the variables? (Strong, Moderate or Weak? Positive, Negative or None?)
+```{r}
+cor(Car_Age, Sell_Price)
+```
+
+(c)
+What proportion of the weight is explained by height? (See Remark 7.1.20)
+
+(d)
+State what the regression line is, and what it measures in the context of this problem.
+```{r}
+cardata = data.frame(Car_Age, Sell_Price)
+model = lm(Sell_Price~Car_Age, data = cardata)
+model
+```
+
+(e)
+Explain the meaning of the slope of the regression line in the context of this problem.
+
+(f)
+What is the predicted price of a 6 year old car?
+```{r}
+ model$coefficients[2]*6 +model$coefficients[1]
+```
+
+(g)
+What is the predicted age of a car that sells for $5000?
+```{r}
+
+```
+
+### Activity 7.2.3. Medial Temporal Lobe. 
+In 2018, a study was done to show a relationship between sedentary behavior and thickness of the medial temporal lobe.
+Run the following code to download the mtl.csv data set which contains information about 35 participants, demographic and psychological information, physical ### Activity and measurements of the MTL: 
+```{r}
+mtl = read.csv("https://github.com/TienChih/tbil-stats/raw/main/data/mtl.csv")
+
+names(mtl)
+```
+
+Click here to learn more about this data set: https://www.openintro.org/data/index.php?data=mtl
+
+(a)
+Run the following code to plot the total thickness of the MTL (in mm), versus their self reported daily time sitting (in hours). 
+```{r}
+plot(mtl$sitting, mtl$total, pch=19)
+```
+
+(b)
+Run the following code to create a linear model for `total`, as a function of `sitting` and save it as `mtlmod`. 
+```{r}
+mtlmod=lm(total~sitting, data=mtl)
+```
+
+(c)
+Run the following code to show the correlation for this model. 
+```{r}
+cor(mtl$sitting, mtl$total)
+```
+
+(d)
+Run the following code to plot the scatterplot and the least squares line. 
+```{r}
+plot(mtl$sitting, mtl$total,  pch=19)
+abline(mtlmod, col="red")
+```
+
+(e)
+Run the following code to show a summary of `mtlmod`. 
+```{r}
+summary(mtlmod)
+```
+
+(f)
+What is \(R\)? What does it tell you about the relationship between the variables? (Strong, Moderate or Weak? Positive, Negative or None?)
+
+(g)
+What proportion of the MLT thickness is explained by hours sitting? (See Remark 7.1.20)
+
+(h)
+State what the regression line is, and what it measures in the context of this problem.
+
+(i)
+Explain the meaning of the slope of the regression line in the context of this problem.
+
+(j)
+What is the predicted total MTL thickness of a someone sitting 12 hours a day?
+
+(k)
+What is the predicted time sitting a day for someone whose total MTL thickness is 2.5 mm?
+
+## Subsection 7.2.2 Pitfalls 
+
+### Remark 7.2.3. 
+
+As mentioned in Remark 1.1.7, Correlation is Not Causation! Sometimes what one thinks is the explanatory and response variables are reversed. Then sometimes two things can have strong correlation without either causing the other.
+
+### Activity 7.2.4. Icecream and Sunglasses. 
+A store owner notices that when her sunglasses sales go up, so does her ice cream sales: 
+```{r}
+x1 = c(110,130,150,150,175,175,180,185,220,230,235)
+y1 = c(180,205,310,320,400,405,410,420,500,530,540)
+plot(x1, y1,  pch=19)
+model = lm(y1~x1)
+summary(model)
+```
+
+Depicted above is a plot of different months, the number of sunglasses she sold, and her sales of ice cream in dollars in the same month, as well as the regression analysis.
+
+(a)
+If she has surplus of ice cream she needs to sell, would it make sense to put a sale on sunglasses to boost sunglasses sales? What about reversing the roles?
+
+(b)
+Why are these variables correlated?
+
+### Remark 7.2.4. 
+
+A linear function is generally defined for all possible values of \(x\), but in the context of some problem, this may not be sensible 
+
+It's important to know for what values it's sensible to apply the linear model, and for what values it is not.
+
+### Activity 7.2.5. Height and Age. 
+
+The height of a female child (in inches) of a given age (in years) is as follows: 
+```{r}
+x1 = c(2,3,4,5,6,7,8,9,10,11,12)
+y1 = c(33.7,37,39.5,42.5,45.4,47.7,50.5,52.5,54.5,56.7,59)
+plot(x1, y1,  pch=19)
+model = lm(y1~x1)
+summary(model)
+```
+
+
+(a)
+According this the regression analysis, how tall will she be when she is 35?
+
+(b)
+Why isn't this sensible?
+
+### Remark 7.2.5. 
+
+As is a theme in other chapters, sometimes random chance delivers data that's correlated, while the underlying variables are not, particularly if the samples are small.
+
+### Activity 7.2.6. Random Correlation. 
+In this Activity, we'll generate totally random data and try to find correlations between them.
+
+(a)
+Run the following code to generate n=10 random X and Y values, plot them, find a regression line and print a correlation: 
+```{r}
+n=10
+X=runif(n, 0, 10)
+Y=runif(n, 0, 10)
+mod=lm(Y~X)
+print(cor(X, Y))
+plot(X, Y, pch=19)
+abline(mod)
+```
+
+Run it a few times, what sort of values can you get, what's the highest you achieved?
+
+(b)
+Chance `n=2` and run it again, what do you notice?

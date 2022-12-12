@@ -1,0 +1,54 @@
+---
+title: "Section 1.2 Homework"
+output: html_notebook
+editor_options: 
+  markdown: 
+    wrap: sentence
+---
+
+1.  Researchers want to collect cholesterol levels of U.S. patients who had a heart attack two days prior.
+    The following are different sampling techniques that the researcher could use.
+    Classify each as simple random sample, stratified sample, systematic sample, cluster sample, or convenience sample.
+
+    -   The researchers randomly select 5 hospitals in the U.S. then measure the cholesterol levels of all the heart attack patients in each of those hospitals.
+
+    -   The researchers list all of the heart attack patients and measure the cholesterol level of every 25th person on the list.
+
+    -   The researchers go to one hospital on a given day and measure the cholesterol level of the heart attack patients at that time.
+
+    -   The researchers list all of the heart attack patients.
+        They then measure the cholesterol levels of randomly selected patients.
+
+    -   The researchers divide the heart attack patients based on race, and then measure the cholesterol levels of randomly selected patients in each race grouping.
+
+2.  The quality control officer at a manufacturing plant needs to determine what percentage of items in a batch are defective.
+    The following are different sampling techniques that could be used by the officer.
+    Classify each as simple random sample, stratified sample, systematic sample, cluster sample, or convenience sample.
+
+    -   The officer lists all of the batches in a given month.
+        The number of defective items is counted in randomly selected batches.
+
+    -   The officer takes the first 10 batches and counts the number of defective items.
+
+    -   The officer groups the batches made in a month into which shift they are made.
+        The number of defective items is counted in randomly selected batches in each shift.
+
+    -   The officer chooses every 15th batch off the line and counts the number of defective items in each chosen batch.
+
+    -   The officer divides the batches made in a month into which day they were made.
+        Then certain days are picked and every batch made that day is counted to determine the number of defective items.
+
+3.  You wish to determine the GPA of students at your school.
+    Describe what process you would go through to collect a sample if you use a simple random sample.
+
+4.  You wish to determine the GPA of students at your school.
+    Describe what process you would go through to collect a sample if you use a stratified sample.
+
+5.  You wish to determine the GPA of students at your school.
+    Describe what process you would go through to collect a sample if you use a systematic sample.
+
+6.  You wish to determine the GPA of students at your school.
+    Describe what process you would go through to collect a sample if you use a cluster sample.
+
+7.  You wish to determine the GPA of students at your school.
+    Describe what process you would go through to collect a sample if you use a convenience sample.

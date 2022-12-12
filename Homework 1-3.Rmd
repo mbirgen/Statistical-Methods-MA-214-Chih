@@ -1,0 +1,110 @@
+---
+title: "Section 1.3 Homework"
+output: html_notebook
+editor_options: 
+  markdown: 
+    wrap: sentence
+---
+
+Homework Exercise 1.3
+
+1.  You want to determine if cinnamon reduces a person's insulin sensitivity.
+    You give patients who are insulin sensitive a certain amount of cinnamon and then measure their glucose levels.
+    Is this an observation or an experiment?
+    Why?
+
+2.  You want to determine if eating more fruits reduces a person's chance of developing cancer.
+    You watch people over the years and ask them to tell you how many servings of fruit they eat each day.
+    You then record who develops cancer.
+    Is this an observation or an experiment?
+    Why?
+
+3.  A researcher wants to evaluate whether countries with lower fertility rates have a higher life expectancy.
+    They collect the fertility rates and the life expectancies of countries around the world.
+    Is this an observation or an experiment?
+    Why?
+
+4.  To evaluate whether a new fertilizer improves plant growth more than the old fertilizer, the fertilizer developer gives some plants the new fertilizer and others the old fertilizer.
+    Is this an observation or an experiment?
+    Why?
+
+5.  A researcher designs an experiment to determine if a new drug lowers the blood pressure of patients with high blood pressure.
+    The patients are randomly selected to be in the study and they randomly pick which group to be in.
+    Is this a randomized experiment?
+    Why or why not?
+
+6.  Doctors trying to see if a new stent works longer for kidney patients, asks patients if they are willing to have one of two different stents put in.
+    During the procedure the doctor decides which stent to put in based on which one is on hand at the time.
+    Is this a randomized experiment?
+    Why or why not?
+
+7.  A researcher wants to determine if diet and exercise together helps people lose weight over just exercising.
+    The researcher solicits volunteers to be part of the study, randomly picks which volunteers are in the study, and then lets each volunteer decide if they want to be in the diet and exercise group or the exercise only group.
+    Is this a randomized experiment?
+    Why or why not?
+
+8.  To determine if lack of exercise reduces flexibility in the knee joint, physical therapists ask for volunteers to join their trials.
+    They then randomly select the volunteers to be in the group that exercises and to be in the group that doesn't exercise.
+    Is this a randomized experiment?
+    Why or why not?
+
+9.  You collect the weights of tagged fish in a tank.
+    You then put an extra protein fish food in water for the fish and then measure their weight a month later.
+    Are the two samples matched pairs or not?
+    Why or why not?
+
+10. A mathematics instructor wants to see if a computer homework system improves the scores of the students in the class.
+    The instructor teaches two different sections of the same course.
+    One section utilizes the computer homework system and the other section completes homework with paper and pencil.
+    Are the two samples matched pairs or not?
+    Why or why not?
+
+11. A business manager wants to see if a new procedure improves the processing time for a task.
+    The manager measures the processing time of the employees then trains the employees using the new procedure.
+    Then each employee performs the task again and the processing time is measured again.
+    Are the two samples matched pairs or not?
+    Why or why not?
+
+12. The prices of generic items are compared to the prices of the equivalent named brand items.
+    Are the two samples matched pairs or not?
+    Why or why not?
+
+13. A doctor gives some of the patients a new drug for treating acne and the rest of the patients receive the old drug.
+    Neither the patient nor the doctor knows who is getting which drug.
+    Is this a blind experiment, double blind experiment, or neither?
+    Why?
+
+14. One group is told to exercise and one group is told to not exercise.
+    Is this a blind experiment, double blind experiment, or neither?
+    Why?
+
+15. The researchers at a hospital want to see if a new surgery procedure has a better recovery time than the old procedure.
+    The patients are not told which procedure that was used on them, but the surgeons obviously did know.
+    Is this a blind experiment, double blind experiment, or neither?
+    Why?
+
+16. To determine if a new medication reduces headache pain, some patients are given the new medication and others are given a placebo.
+    Neither the researchers nor the patients know who is taking the real medication and who is taking the placebo.
+    Is this a blind experiment, double blind experiment, or neither?
+    Why?
+
+17. A new study is underway to track the eating and exercise patterns of people at different time periods in the future, and see who is afflicted with cancer later in life.
+    Is this a cross-sectional study, a retrospective study, or a prospective study?
+    Why?
+
+18. To determine if a new medication reduces headache pain, some patients are given the new medication and others are given a placebo.
+    The pain levels of a patient are then recorded.
+    Is this a cross-sectional study, a retrospective study, or a prospective study?
+    Why?
+
+19. To see if there is a link between smoking and bladder cancer, patients with bladder cancer are asked if they currently smoke or if they smoked in the past.
+    Is this a cross-sectional study, a retrospective study, or a prospective study?
+    Why?
+
+20. The Nurses Health Survey was a survey where nurses were asked to record their eating habits over a period of time, and their general health was recorded.
+    Is this a cross-sectional study, a retrospective study, or a prospective study?
+    Why?
+
+21. Consider a question that you would like to answer.
+    Describe how you would design your own experiment.
+    Make sure you state the question you would like to answer, then determine if an experiment or an observation is to be done, decide if the question needs one or two samples, if two samples are the samples matched, if this is a randomized experiment, if there is any blinding, and if this is a cross-sectional, retrospective, or prospective study.

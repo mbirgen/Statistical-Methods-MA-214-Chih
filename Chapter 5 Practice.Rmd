@@ -1,0 +1,30 @@
+---
+title: "Chapter 5 Practice"
+output: html_notebook
+---
+A newspaper polls members of two political parties to measure their position on a newly proposed law. The polled participants either Support, are Neutral, or Oppose the proposed law:
+
+
+Use a \(\chi^2\) independence test to test whether position on this law is independent of party affiliation.
+
+State the null hypothesis for this test.
+Position on this law is independent of party affiliation.
+
+State the alternative hypothesis for this test.
+Position on this law is dependent on party affiliation.
+
+Using complete sentences, state the meaning of the p-value in the context of this problem.
+The p-value is the probability that position on this law is independent of party affiliation based on the sample data that we are studying.
+
+What do we conclude? Why?
+```{r}
+Input =("
+Position Support  Neutral  Oppose
+Party_A        26  78  54
+Party_B        47  87  50
+")
+
+datamatrix = as.matrix(read.table(textConnection(Input),header=TRUE,row.names=1))
+chisq.test(datamatrix, correct=FALSE)
+```
+If alpha = 0.05 we fail to reject the null hypothesis because our p-value is larger than alpha. If alpha = 0.10 we reject the null hypothesis because our p-value is less than alpha.

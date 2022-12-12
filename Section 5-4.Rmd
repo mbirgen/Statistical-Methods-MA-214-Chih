@@ -1,0 +1,357 @@
+---
+title: "Chi-Squared Test and Independence (C4)"
+author: ""
+output: html_notebook
+---
+
+In this section, we compare samples from two different populations, to see if the populations may have the same distribution. In other words, are the outcomes equally likely, no matter which population I draw from?
+
+### Exploration 5.4.1. OER vs Predatory Publishers and Student Access.  
+Students across different sections of the same course are assigned different texts. Some students are assigned free OER resources as their text, and others are assigned overpriced texts from predatory publishers. After 2 weeks the professors take a random anonymous poll of their classes to see how many students have managed to begun the assigned readings in their respective texts. The results are as follows:
+
+|   Sample Frequency  	| Has Done Reading 	| Has Not Yet Done Reading 	|
+|:-------------------:	|:----------------:	|:------------------------:	|
+|         OER         	|        66        	|            14            	|
+| Predatory Publisher 	|        112       	|            58            	|
+
+```{r}
+sample_table = data.frame(Read = c(66,112), NotRead = c(14,58))
+rownames(sample_table) = c("OER", "PP")
+sample_table
+```
+
+One professor claims that this constitutes a clear difference between the type of resource assigned to students and whether or not they can complete their assigned tasks. Their colleague dismisses it and says any difference is purely due to random chance, and the type of material has no impact on student accessibility, in other words these things are independent.
+
+(a) How many students in all were surveyed? This is the sample size $n$.
+```{r}
+n = 14+66+58+112
+n
+```
+
+
+(b) Let $R$ denote the event “student has done the reading”. What proportion of the sample has done the reading? This is $P(R)$.
+```{r}
+P_R=(66+112)/n
+P_R
+```
+
+
+(c) Note the event $R^c$ would denote “student has not done the reading”. Compute $P(R^c)$.
+```{r}
+P_Rc = FIXME
+```
+
+
+(d) Let $O$ denote the event “student was assigned an OER”. What proportion of the sample were assigned OER's? This is $P(O)$.
+```{r}
+P_O = (66+14)/n
+```
+
+
+(e) Note the event $O^c$ would denote “student was assigned a publisher text”. Compute $P(O^c)$.
+```{r}
+
+```
+
+
+(f) Suppose we took the colleague at their word and assumed these events were **independent**.
+Using Remark 2.2.6 compute $P(R\text{ and }O)$ and $P(R\text{ and }O^c)$ and $P(R^c\text{ and }O)$ and $P(R^c\text{ and }O^c)$.
+
+
+(g) Using the probabilities found in (f), the following code will create a table with the expected frequencies if one took a sample of size $n$ and the probabilities were as in (f).
+```{r}
+table = data.frame(Read = c(P_R*P_O, (1-P_R)*P_O), NotRead = c(P_R*(1-P_O), (1-P_R)*(1-P_O)))
+rownames(table) = c("OER", "PP")
+n*table
+```
+
+
+ 
+How different are these values from the sample?
+
+>
+
+## 5.4.1 Testing for Independence
+Remark 5.4.1. Test statistics for $\chi^2$ tests for independence.  When we test to see if the distributions of a variable is independent of which population it comes from, we approach this very similarly to when we did so in the previous section. 
+
+Suppose we had  populations $P_1,\dots,P_\ell$, from which each random variable has $k$ outcomes $O_1,\dots,O_\ell$. We also have a sample of size $n$ where the frequency of occurrences from Population $i$ and Outcome $j$ is $n_{i,j}$:
+
+| Sample Frequency 	| $O_1$        	| $O_2$        	| $\cdots$ 	| $O_k$        	|
+|------------------	|--------------	|--------------	|----------	|--------------	|
+| $P_1$            	| $n_{1,1}$    	| $n_{1,2}$    	| $\cdots$ 	| $n_{1,k}$    	|
+| $P_2$            	| $n_{2,1}$    	| $n_{2,2}$    	| $\cdots$ 	| $n_{2,k}$    	|
+| $\vdots$         	| $\vdots$     	| $\vdots$     	| $\vdots$ 	| $\vdots$     	|
+| $P_\ell$         	| $n_{\ell,1}$ 	| $n_{\ell,2}$ 	| $\cdots$ 	| $n_{\ell,k}$ 	|
+				
+ 
+We first note that the probability that if we selected an arbitrary data point from this sample, the probability it has Population $P_i$ is the sum of row $i$ divided by $n$ the size of the sample. Similarly, the probability it has Outcome $O_j$ is the sum of column $j$ divided by $n$ the size of the sample. From this, *IF* we were to assume events$P_i,O_j$  were independent, we would have $P(P_i\cap O_j)= P(P_i)P(O_j)$ and the expected number of occurrences from a sample of size $n$ from Population $P_i$ with Outcome $O_j$ is:
+
+\[E_{i,j} = n\cdot P(P_i)P(O_j) = n\cdot \frac{\text{sum of row }i}{n}\frac{\text{sum of column }j}{n}=\frac{\text{sum of row }i\cdot \text{sum of column }j}{n}\]
+
+From here we can compute a table of expected frequencies.
+
+| Expected Frequency 	| $O_1$        	| $O_2$        	| $\cdots$ 	| $O_k$        	|
+|--------------------	|--------------	|--------------	|----------	|--------------	|
+| $P_1$              	| $E_{1,1}$    	| $E_{1,2}$    	| $\cdots$ 	| $E_{1,k}$    	|
+| $P_2$              	| $E_{2,1}$    	| $E_{2,2}$    	| $\cdots$ 	| $E_{2,k}$    	|
+| $\vdots$           	| $\vdots$     	| $\vdots$     	| $\vdots$ 	| $\vdots$     	|
+| $P_\ell$           	| $E_{\ell,1}$ 	| $E_{\ell,2}$ 	| $\cdots$ 	| $E_{\ell,k}$ 	|			
+ 
+Then, much like Remark 5.3.1, $Z_{i,j}$ computes the test statistic for $P_i\cap O_j$ and is computed in a similar way:
+\[ Z_{i,j} = \frac{n_{i,j}-E_{i,j}}{\sqrt{E_{i,j}}}, \]
+ 
+Then once again $\chi^2$ is the sum of the squares of the $Z_{i,j}$:
+\[ \chi^2 = \sum Z_{i,j}^2\]
+
+### Activity 5.4.2. OER vs Predatory Publishers and Student Access: test statistics.  
+
+Recall from Exploration 5.4.1 the following table of sample frequencies:
+```{r}
+sample_table
+```
+
+
+As well as the table of computed expected frequencies computed in ### Exploration 5.4.1 (g).
+```{r}
+table
+```
+
+
+(a) Use these two tables and Remark 5.4.1 to compute $Z_{1,1}$ the test statistic for “OER and Has Done Reading”.
+```{r}
+Z_11 = (sample_table[1,1]-table[1,1])/sqrt(table[1,1])
+```
+
+(b) Use these two tables and Remark 5.4.1 to compute $Z_{1,2}$ the test statistic for “OER and Has not Done Reading”.
+```{r}
+Z_12 = (sample_table[1,2]-table[1,2])/sqrt(table[1,2])
+```
+
+(c) Use these two tables and Remark 5.4.1 to compute $Z_{2,1}$ the test statistic for “Predatory Publisher and Has Done Reading”.
+```{r}
+
+```
+
+(d) Use these two tables and Remark 5.4.1 to compute $Z_{2,2}$ the test statistic for “Predatory Publisher and Has not Done Reading”.
+```{r}
+
+```
+
+(e) Use Remark 5.4.1 to compute $\chi^2$.
+```{r}
+chi2 = Z_11^2+Z_12^2+Z_21^2+Z_22^2
+chi2
+```
+
+### Remark 5.4.2. Steps to  Hypothesis Testing: Independence.  
+Given the set of hypothesis:
+
+* $H_0$:“The outcomes are independent of the populations.”
+
+* $H_A$:“The outcomes are not independent of the populations.”
+
+We compute the $p$-value to be the area of the tail on the $\chi^2$ distribution corresponding to the  value computed via Remark 5.4.1 and with $(k-1)(\ell-1)$ degrees of freedom (recall that $k$ is the number of possible values of the categorical variable.)
+
+As in other hypothesis testing scenarios, the $p$-value measures the probability that, if we assume the null hypothesis, that we see values as or more extreme than what was observed.
+
+We then reject or accept the null based on the level of significance  which is as before usually 0.05 or 5%. If the $p$-value is less than $\alpha$, we reject the null hypothesis, otherwise we accept it. In this context, accepting the null is to say the the populations and outcomes are independent. If we reject that then we say it is implausible that they are.
+
+### Activity 5.4.3. OER vs Predatory Publishers and Student Access: test statistics.  Recall from Activity 5.4.2 the $\chi^2$ value you computed.
+(a) What is $k$ in this problem, what is $\ell$? How many degrees of freedom do we have?
+```{r}
+k= FIXME
+ell = FIXME
+degfree = (k-1)*(ell-1)
+```
+
+
+(b) Use any method to compute a $p$-value.
+```{r}
+pchisq(chi2,degfree, lower.tail = FALSE)
+```
+
+
+(c) State the meaning of the $p$-value within the context of this problem in a complete sentence.
+
+>
+
+(d) If we had a level of significance $\alpha = 0.05$ do we reject the null hypothesis?
+
+>
+
+(e) Is it plausible for the type of assigned materials and whether or not students do the reading, to be independent?
+
+>
+
+### Activity 5.4.4. $\chi^2$ independence testing with R.  
+We can use `R` to enter the data and compute the $\chi^2$ statistic and $p$-value.
+(a) Run the following code to input the sample data from ### Exploration 5.4.1 as a matrix.
+
+```{r}
+Input =("
+MaterialType   DoneReading    NoReading
+OER             66              14
+Predatory       112             58
+")
+datamatrix = as.matrix(read.table(textConnection(Input),header=TRUE,row.names=1))
+```
+
+
+If you use this method be sure to not use spaces in your names.
+(b) Run the following code to compute a  statistic, -value and degrees of freedom.
+```{r}
+chisq.test(datamatrix, correct=FALSE)
+```
+
+How do these values compare to what you found in Activity 5.4.3?
+
+>
+
+Note that given what we have already entered, we can also just use:
+```{r}
+chisq.test(sample_table, correct = FALSE)
+```
+
+### Activity 5.4.5. Gender and Protein Preferences.  A restaurateur wonders if there's any difference in the type of meat her customers order and their gender. She surveys 500 customers, 218 men and 282 women. The choices for meat are Beef, Chicken and Pork. The results are as follows:
+
+| Sample Frequency 	| Beef 	| Chicken 	| Pork 	|
+|------------------	|:----:	|:-------:	|:----:	|
+| Men              	|  65  	|   108   	|  45  	|
+| Women            	|  84  	|   136   	|  62  	|			
+ 
+(a) State a null and alternative hypothesis for the  independence test.
+
+>
+
+(b) State the meaning of the $p$-value within the context of this problem in a complete sentence.
+
+>
+
+(c) Fix and run the following code to input the sample data and perform a  independence test.
+```{r}
+Input =("
+ProteinType   Beef    Chicken    Pork
+Men           FIXME   FIXME      FIXME
+Women         FIXME   FIXME      FIXME
+")
+
+
+datamatrix = as.matrix(read.table(textConnection(Input),header=TRUE,row.names=1))
+
+chisq.test(datamatrix, correct=FALSE)
+```
+
+
+(d) If we had a level of significance $\alpha = 0.05$ do we reject the null hypothesis?
+
+>
+
+(e) Is it plausible for the gender and meat choice to be independent?
+
+>
+
+
+### Activity 5.4.6. Pew Survey on Energy Sources in 2018.  
+We examine data from a US-based survey on support for expanding six different sources of energy, including solar, wind, offshore drilling, hydraulic fracturing ("fracking"), coal, and nuclear.
+Run the following code to download `pew_energy_2018.csv` data set and to display it's variables. To learn more about this data click here: https://www.openintro.org/data/index.php?data=pew_energy_2018
+```{r}
+energy = read.csv("https://github.com/TienChih/tbil-stats/raw/main/data/pew_energy_2018.csv")
+names(energy)
+```
+
+
+(a) A researcher is curious to see if a person's position on expanding solar energy is independent of their attitude towards expanding coal mining. State a null and alternative for the $\chi^2$ independence test.
+
+(b) Run the following code to display a sample frequency table comparing support levels for expanding solar energy as rows and expanding coal mining as columns.
+```{r}
+table(energy$solar_panel_farms, energy$coal_mining)
+
+```
+
+
+(c) Run the following code to run the  independence test on energy$solar_panel_farms and energy$coal_mining.
+```{r}
+chisq.test(energy$solar_panel_farms, energy$coal_mining, correct=FALSE)
+```
+
+
+(d) State the meaning of the $p$-value within the context of this problem in a complete sentence.
+
+>
+
+(e) Run the following code to show a mosaic plots comparing support of expansion for solar and coal energy. What can you tell from this plot? Is the mosaic plot a surprise given the results of the $\chi^2$ test? Explain.
+```{r}
+counts=table(energy$solar_panel_farms, energy$coal_mining)
+
+mosaicplot(counts)
+```
+
+
+(f) If we had a level of significance $\alpha = 0.05$ do we reject the null hypothesis?
+
+>
+
+(g) Is it plausible for support for solar and coal expansion to be independent?
+
+>
+
+(h) Pick any two energy sources and repeat the steps above for those energy sources.
+```{r}
+
+```
+
+
+### Activity 5.4.7. Movie Data.  
+We examine data obtained from IMDB and Rotten Tomatoes. The data represent 456 randomly sampled movies released between 1972 to 2014 in the Unites States.
+Run the following code to download `movies.Rdata` data set and to display it's variables.
+```{r}
+load(url("https://github.com/TienChih/tbil-stats/raw/main/data/movies.Rdata"))
+names(movies)
+```
+
+(a) We're curious to see if genre of a movie, and how Rotten Tomatoes rates it, are independent. State a null and alternative for the  independence test.
+
+>
+
+(b) Run the following code to display a sample frequency table comparing the genre of a movie and their Rotten Tomatoes score.
+```{r}
+table(movies$genre, movies$critics_rating)
+```
+
+(c) Run the following code to show a mosaic plots comparing the genre of a movie and their Rotten Tomatoes score. What can you tell from this plot?
+```{r}
+counts=table(movies$genre, movies$critics_rating)
+
+mosaicplot(counts)
+```
+
+>
+
+(d) Run the following code to run the $\chi^2$ independence test on `movies$genre` and `movies$critics_rating`.
+```{r}
+chisq.test(movies$genre, movies$critics_rating, correct=FALSE)
+```
+
+
+
+(e) State the meaning of the -value within the context of this problem in a complete sentence.
+
+>
+
+(f) If we had a level of significance $\alpha = 0.05$ do we reject the null hypothesis?
+
+(g) Is it plausible for support for the genre of a movie and the Rotten Tomatoes rating to be independent?
+
+>
+
+(h) Run the following code to obtain summaries of the variables. Which are categorical?
+```{r}
+summary(movies)
+```
+
+
+(i) Repeat the above steps comparing any two categorical variables of your choice.
+```{r}
+
+```
+

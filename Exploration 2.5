@@ -1,0 +1,31 @@
+---
+title: "Linear Combinations of Random Variables"
+author: "Birgen"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+* Exploration 2.5.1. Sum of Dice: Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
+
+```{r}
+bluedierolls = sample(c(1, 2, 3, 4, 5, 6), 1000, replace = TRUE, prob = c(1/6, 1/6, 1/6, 1/6, 1/6, 1/6))
+greendierolls = sample(c(1, 2, 3, 4, 5, 6), 1000, replace = TRUE, prob = c(1/6, 1/6, 1/6, 1/6, 1/6, 1/6))
+diesum=bluedierolls+greendierolls
+hist(diesum)
+```
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
+
+The preview shows you a rendered HTML copy of the contents of the editor. The output of the chunk when it was last run in the editor is displayed.
+
+Run the following code to find the mean and variance of these die rolls
+```{r}
+mean(diesum)
+var(diesum)
+```
+How do these compare with what you found on the worksheet?
+>>
+

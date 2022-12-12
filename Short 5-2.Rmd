@@ -1,0 +1,107 @@
+---
+title: "Short Section 5-2"
+author: "Mariah Birgen"
+output: html_notebook
+---
+### Initial Information
+Input the information from your sample:
+```{r}
+x_1 = FIXME
+n_1 = FIXME
+x_2 = FIXME
+n_2 = FIXME
+    
+```
+
+### Calculating Confidence Intervals:
+If you sample n_1 items and have x_1 positives and you sample n_2 other items and have x_2 positives and you want a C-confidence interval
+```{r}
+phat_1=x_1/n_1
+phat_2=x_2/n_2
+
+d=phat_1-phat_2
+
+SE_D=sqrt(phat_1*(1-phat_1)/n_1 + phat_2*(1-phat_2)/n_2)
+z_star = qnorm(1-C/2,0,1)
+LB=d-z_star*SE_D
+UB=d+z_star*SE_D
+print(paste0("Lower Bound: ", LB , ", Upper Bound:", UB))
+```
+
+### Calculating Hypothesis Tests
+
+Make sure you have input your information above and have decided what type of hypothesis test you are calculating.
+
+#### Pooled Samples
+If your null hypothesis is that both populations have the same proportion, we need to calculate the pooled sample proportion.
+```{r}
+p_pool = (x_1+x_2)/(n_1+n_1)
+```
+
+$\mu_D$ is the mean of your null hypothesis.
+```{r}
+mu_D = FIXME
+SE_D = sqrt(p_pool*(1-p_pool)/n_1+p_pool*(1-p_pool)/n_2)
+observed_diff = x_1/n_1-x_2/n_2
+observed_diff
+mu_D
+SE_D
+```
+
+Next, calculate $\hat z$
+```{r}
+z_hatp = (observed_diff-mu_D)/SE_D
+print(z_hatp)
+```
+
+Last, calculate your p-value. 
+If your alternative hypothesis is one-sided:
+```{r}
+pnorm(abs(z_hatp),0,1,lower.tail = FALSE)
+```
+
+If your alternative hypothesis is two-sided:
+```{r}
+2*pnorm(abs(z_hatp),0,1,lower.tail = FALSE)
+```
+
+Run the following code to n_1 of your first population and n_2 of your second population using the pooled proportion. It does this `trials=1000` times and plots a histogram of the differences.
+```{r}
+trials=1000
+num_men=n_1
+num_women=n_2
+m_raise=x_1
+w_raise=x_2
+
+raise_rate=(m_raise+w_raise)/(num_men+num_women)
+diffraise=rep(NA, trials)
+
+for(i in 1:trials){
+    menraise=sample(c("RAISE", "NO"), num_men, replace=TRUE, prob=c(raise_rate, 1-raise_rate))
+    womenraise=sample(c("RAISE", "NO"), num_women, replace=TRUE, prob=c(raise_rate, 1-raise_rate))
+    diffraise[i]=length(which(menraise=="RAISE"))/num_men-length(which(womenraise=="RAISE"))/num_women
+}
+hist(diffraise, breaks=25, prob=TRUE)
+```
+
+The following code to plot a normal curve with mean `mu_D` and standard deviation `SE_D`, and plot a line for the observed difference `observed_diff=`
+```{r}
+
+hist(diffraise, breaks=25, prob=TRUE)
+curve(dnorm(x, mean=mu_D, sd=SE_D), col="darkblue", lwd=2, add=TRUE, yaxt="n")
+abline(v = observed_diff, col="red", lwd=3, lty=2)
+
+```
+
+Run the following code to see what proportion of these differences are greater than or equal to the observed_diff. 
+```{r}
+length(which(diffraise>=observed_diff))/trials
+```
+
+### Short Code
+The possible alternatives are "two.sided", "greater" and "less".
+
+```{r}
+prop.test(c(x_1, x_2), c(n_1, n_2), 
+        p=NULL, alternative="greater", correct=FALSE)
+```

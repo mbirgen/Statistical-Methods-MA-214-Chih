@@ -1,0 +1,58 @@
+---
+title: "Data Basics Homework 3"
+author: "Author"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
+
+```{r}
+starbucks = read.csv("https://github.com/TienChih/tbil-stats/raw/main/data/starbucks.csv")
+names(starbucks)
+nrow(starbucks)
+```
+
+This data set represents 77 menu items that you can purchase at Starbucks. Each row contains information about the nutritional data for a particular menu item
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
+
+The preview shows you a rendered HTML copy of the contents of the editor. The output of the chunk when it was last run in the editor is displayed.
+
+## Problem 1:
+Add a new chunk of code to generate a scatter plot for the level of protein in each Starbucks menu item compared to amount of calories for that item, protein and calories. The command that you will fix is:
+
+    plot(starbucks$FIXME1, starbucks$FIXME2)).
+
+Indicate what you fixed, and upload the generated image.
+
+## Problem 2:
+Add a new chunk of code to fix and run the following code to download the resume.csv data, and generate a mosaic plot for whether or not someone got a call back on their resume, and their race, race and received_callback.
+
+    resume = read.csv("https://github.com/TienChih/tbil-stats/raw/main/data/resume.csv")
+    
+    counts = table(resume$FIXME1, resume$FIXME2); mosaicplot(counts)
+
+
+Indicate what you fixed, and upload the generated image.
+
+## Problem 3:
+Add a new chunk of code to fix and run the following code in the R cell to download the cherry.csv data, and generate a histogram for the height of 31 trees in the Allegheny National Forest, Pennsylvania, in feet, height .
+
+    cherry = read.csv("https://github.com/TienChih/tbil-stats/raw/main/data/cherry.csv")
+
+    hist(cherry$FIXME)
+
+Indicate what you fixed, and upload the generated image.
+
+## Problem 4:
+Add a new chunk of code to fix and run the following code in the R cell to download the burger.csv data, and generate a bar chart for the prefered burger location of 500 surveyed people, best_burger_place .
+
+    burger = read.csv("https://github.com/TienChih/tbil-stats/raw/main/data/burger.csv")
+
+    counts = table(burger$FIXME); barplot(counts)
+
+Indicate what you fixed, and upload the generated image.

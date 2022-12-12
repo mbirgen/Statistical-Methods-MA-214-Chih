@@ -1,0 +1,494 @@
+---
+title: "Comparing Two Categorical Variables"
+output: html_notebook
+---
+### Exploration 5.2.1. Gender and Raises.  
+
+A watchdog group concerned about gender discrimination at a company randomly polls 528 of the company's employees, 312 men and 216 women. At the end of last year of those surveyed, 102 employees received raises: 72 men and 30 women. The watchdog group points out that the proportion of men who got raises is significantly greater than the proportion of women who got raises and suggests this is due to inequitable practices within the company. The company claims that any difference between the rates and men and women getting raises is purely by random chance.
+
+(a) Find  the proportion of the sampled employees of the company who got a raise.
+```{r}
+raise_rate = 102/528
+print(raise_rate)
+```
+
+(b) How many more men than women in this sample got raises this year?
+```{r}
+72-30
+```
+
+(c) The company claims that rates of raises are equal across gender and any deviation in a given year is by chance. If this were true, we would expect more men than women to get raises since there are more men in the sample. But by how much?
+
+Let's put the companies claim to the test. Run the following code to simulate a `raise_rate` of \(\hat p\)
+ found in (a). We then simulate how many `num_men=312` and `num_women=216` got raises and calculate their difference `d`.
+
+```{r}
+
+raise_rate=FIXME
+
+num_men=312
+
+num_women=216
+
+menraise=sample(c("RAISE", "NO"), num_men, replace=TRUE, prob=c(raise_rate, 1-raise_rate))
+
+womenraise=sample(c("RAISE", "NO"), num_women, replace=TRUE, prob=c(raise_rate, 1-raise_rate))
+
+d=length(which(menraise=="RAISE"))-length(which(womenraise=="RAISE"))
+
+print(d)
+```
+
+How does this value compare to what you found in (b)?
+
+(d) Let's take it a step further. Fix and run the following code to simulate a 1000 random promotion schedules, and plot a distribution of the differences between men and women promoted. Enter in `observed_diff` to be the value found in (b)
+
+```{r}
+
+observed_diff=FIXME
+
+diff_vec=rep(NA,1000)
+
+for(i in 1:1000){
+        menraise=sample(c("RAISE", "NO"), num_men,
+                  replace=TRUE, prob=c(raise_rate, 1-raise_rate))    
+        womenraise=sample(c("RAISE", "NO"), num_women, replace=TRUE, prob=c(raise_rate, 1-raise_rate))
+    d=length(which(menraise=="RAISE"))-length(which(womenraise=="RAISE"))
+    diff_vec[i]=d
+}   
+
+hist(diff_vec)
+abline(v = observed_diff, col="red", lwd=3, lty=2)
+print(observed_diff)
+```
+
+How likely is the difference you observed in (b)?
+
+(e) Run the following code to see the proportion of trials where the difference in promotions was as big or greater as found in (b).
+
+```{r}
+length(which(diff_vec>=observed_diff))/1000
+```
+
+(f) How plausible is the companies claim that this differences in promotion rates is purely due to chance?
+
+## Differences of Proportion Variables
+
+### Activity 5.2.2. Smoking and Baby Weight.  
+A 1967 study shows that the probability that a baby has low birth weight is about 7.8% if the mother smokes, and 2.9% if the mother does not.
+
+(a) Suppose we sampled 500 babies from mothers who smoke (\(n_1=500\)). We are given the probability a given baby is underweight is \(p_1=0.078\). Following Theorem 4.1.4 what is the expected proportion of this sample to be underweight: \(\hat p_1\)? (Don't over-think this one.)
+```{r}
+p_1 = 0.078
+p_1
+```
+
+(b) Use \(Var_{\hat p}=\frac{p(1-p)}{n}\) to find the variance of \(p_1: Var_{\hat p_1}\).
+```{r}
+Var_1 = p_1*(1-p_1)/500
+Var_1
+```
+
+(c) Suppose we sampled 1000 babies from mothers who do not smoke (\(n_2=1000\)). We are given the probability a given baby is underweight is \(p_2=0.029\). What is the expected proportion of this sample to be underweight: \(\hat p_2\)?
+```{r}
+p_2 = FIXME
+```
+
+(d) Find the variance of \(p_2: Var_{\hat p_2}\).
+```{r}
+Var_2 = FIXME
+```
+
+(e) Let \(D\) denote the difference between the sampling distributions. Find \(\mu_D\), the mean of the difference of the sampling distributions.
+```{r}
+mu_D=p_1-p_2
+```
+
+(f) Recalling the theorem below, find the variance of \(D\): \(Var_D\).
+
+> Given random varaibles \(X,Y\) and a constant \(c\), the random variable \(X+Y\) has \(E(X+Y) = E(X)+E(Y)\) and \(Var(X+Y) = Var(X)+Var(Y)\) and the random variable \(cX\) has \(E(cX) = cE(X)\) and \(Var(cX) = c^2 Var(X)\).
+```{r}
+Var_D = FIXME
+```
+
+
+(g) Find the standard deviation of \(D\): \(SE_D=\sqrt{Var_D}\).
+```{r}
+SE_D=FIXME
+```
+
+(h) Run the following code to simulate 1000 trials of sampling 500 babies from mothers who smoke, 1000 babies from mothers who do not smoke, taking the difference in proportions of babies who are underweight, and plotting a histogram of the results.
+```{r}
+smoke_n=500
+nosmoke_n=1000
+smoke_p=0.078
+nosmoke_p=0.029
+trials=1000
+
+diff_underweight=rep(NA, trials)
+
+for(i in 1:trials){
+    smoke_samp=sample(c("UNDERWEIGHT", "NO"), smoke_n, replace=TRUE, prob=c(smoke_p, 1-smoke_p))
+    nosmoke_samp=sample(c("UNDERWEIGHT", "NO"), nosmoke_n, replace=TRUE, prob=c(nosmoke_p, 1-nosmoke_p))
+    diff_underweight[i]=length(which(smoke_samp=="UNDERWEIGHT"))/smoke_n-length(which(nosmoke_samp=="UNDERWEIGHT"))/nosmoke_n
+}
+hist(diff_underweight, breaks=25, prob=TRUE)
+```
+
+(i) Fix and run the following code so that `mu_D=`\(\mu_D\) and `SE_D=`\(SE_D\) and plot a normal curve on top of our histogram.
+```{r}
+# mu_D=FIXME
+# SE_D=FIXME
+
+hist(diff_underweight, breaks=25, prob=TRUE)
+curve(dnorm(x, mean=mu_D, sd=SE_D), col="darkblue", lwd=2, add=TRUE, yaxt="n")
+```
+
+How well does the normal distribution approximate the histogram?
+
+### Remark 5.2.3. Difference of Proportions.  
+Let there be two random categorical variables, with population proportions \(p_1,p_2\). Then let \(D\) be the random variable generated by taking random samples of size \(n_1,n_2\) of the two variables and taking the difference in their proportions. Then \(D\) is approximated by a normal variable with mean and standard deviation:
+\[ \mu_D = p_1-p_2, SE_D = \sqrt{\frac{p_1(1-p_1)}{n_1}+\frac{p_2(1-p_2)}{n_2}}.\]
+
+### Activity 5.2.3. Toppings on Frozen Desserts.  
+Let's suppose that 60% of ice cream eaters and 45% of frozen yogurt eaters put toppings on their frozen dessert of choice. We sample 80 ice cream eaters and 110 frozen yogurt eaters.
+
+(a) Run the following code to sample the ice cream eaters, see how many got toppings, and see what proportion of them got toppings.
+
+```{r}
+icecream_n=80
+icecream_p=0.6
+
+icecream_samp=sample(c("TOPPINGS", "NO"), icecream_n, replace=TRUE, prob=c(icecream_p, 1-icecream_p))
+
+length(which(icecream_samp=="TOPPINGS"))
+icecream_prop=length(which(icecream_samp=="TOPPINGS"))/icecream_n
+```
+
+(b) Run the following code to sample the frozen yogurt eaters, see how many got toppings, and see what proportion of them got toppings.
+
+```{r}
+frozen_n=110
+frozen_p=0.45
+
+frozen_samp=sample(c("TOPPINGS", "NO"), frozen_n, replace=TRUE, prob=c(frozen_p, 1-frozen_p))
+length(which(frozen_samp=="TOPPINGS"))
+frozen_prop=length(which(frozen_samp=="TOPPINGS"))/frozen_n
+```
+
+(c) Run the following code to compute the difference in proportions between the samples.
+
+```{r}
+icecream_prop-frozen_prop
+```
+
+(d) Run the following code to simulate 1000 trials of random samplings, and plot a histogram of their differences.
+```{r}
+prop_diff=rep(NA,1000)
+
+for(i in 1:1000){
+    icecream_samp=sample(c("TOPPINGS", "NO"), icecream_n, replace=TRUE, prob=c(icecream_p, 1-icecream_p))
+    icecream_prop=length(which(icecream_samp=="TOPPINGS"))/icecream_n
+    frozen_samp=sample(c("TOPPINGS", "NO"), frozen_n, replace=TRUE, prob=c(frozen_p, 1-frozen_p))
+    frozen_prop=length(which(frozen_samp=="TOPPINGS"))/frozen_n
+    prop_diff[i]=icecream_prop-frozen_prop
+}
+hist(prop_diff, breaks=25, prob=TRUE)
+```
+
+(e) Given that \(p_1=0.6, n_1=80, p_2=0.45, n_2=110\),  compute \(\mu_D\) the mean of the distribution of differences, and \(SE_D\), the standard deviation of the distribution of differences.
+```{r}
+mu_D=FIXME
+SE_D=FIXME
+```
+
+(f) Fix and run the following code to overlay a normal curve with mean mu_D= and standard deviation SE_D= over the histogram you found.
+```{r}
+hist(prop_diff, breaks=25, prob=TRUE)
+
+curve(dnorm(x, mean=mu_D, sd=SE_D), col="darkblue", lwd=2, add=TRUE, yaxt="n")
+
+```
+
+How well does this normal curve approximate the distribution of differences?
+>
+
+## Confidence Intervals for Differences of Proportions
+ 
+A C % confidence interval for the difference between the true proportions \(D=p_1-p_2\) is an interval centered at \(d=\hat p_1-\hat p_2\)  which has a C% chance of containing \(D\).
+
+We can compute this interval to be
+\[ [(p_1-p_2)-z^*SE_D,(p_1-p_2)+z^*SE_D]\]
+where \(SE_D = \sqrt{\frac{p_1(1-p_1)}{n_1}+\frac{p_2(1-p_2)}{n_2}}\) as above and \(z^*\) is found as before.
+```{r}
+qnorm(1-C/2,0,1)
+```
+
+### Activity 5.2.4. Spicy Wings.  
+A restaurateur owns two separate restaurants, and East and West location. Before contacting her vendors, she want's to know if there is any difference in the rate at which customers at these locations order Spicy Wings. Her plan is to poll 100 customers from each location, and compute a 90% confidence interval for the difference in ordering rates of Spicy Wings.
+
+(a) Run the following code to poll 100 customers in the East location and see how many order spicy wings.
+```{r}
+eastpoll=100
+east_p=sample(c(0.3, 0.4, 0.5), 1, prob=c(0.25, 0.5, 0.25))
+
+east_samp=sample(c("SPICYWINGS", "NO"), eastpoll, replace=TRUE, prob=c(east_p, 1-east_p))
+east_x=length(which(east_samp=="SPICYWINGS"))
+```
+We know that \(n_1=100\), compute \(\hat p_1\), the proportion of the East location sample who orders Spicy Wings.
+
+(b) Run the following code to poll 100 customers in the West location and see how many order spicy wings.
+```{r}
+westpoll=100
+west_p=sample(c(0.3, 0.4, 0.5), 1, prob=c(0.25, 0.5, 0.25))
+
+west_samp=sample(c("SPICYWINGS", "NO"), westpoll, replace=TRUE, prob=c(west_p, 1-west_p))
+west_x=length(which(west_samp=="SPICYWINGS"))
+```
+
+We know that \(n_2=100\), compute \(\hat p_2\), the proportion of the West location sample who orders Spicy Wings.
+(c) Find \(d, DE_D\).
+
+(d) Find a 90% confidence interval for the difference in East location ordering rates of Spicy Wings and West location ordering rates of Spicy Wings. Is 0 in this interval?
+
+(e) Do you have good evidence that the ordering rates between the locations are different? If so, who orders more wings?
+
+(f) Run the following code to print the lower and upper-bound of the confidence interval to check your answer.
+```{r}
+east_phat=east_x/eastpoll
+west_phat=west_x/westpoll
+
+d=east_phat-west_phat
+
+SE_D=sqrt(east_phat*(1-east_phat)/eastpoll + west_phat*(1-west_phat)/westpoll)
+z_star = qnorm(1-0.90/2,0,1)
+LB=d-z_star*SE_D
+UB=d+z_star*SE_D
+print(paste0("Lower Bound: ", LB , ", Upper Bound:", UB))
+```
+
+
+(g) Run the following code to print the actual difference between the ordering rates. Is it in your interval? (10% of the time it won't be!).
+```{r}
+east_p-west_p
+```
+
+
+## Hypothesis Testing with two Categorical Variables
+
+### Remark 5.2.6.  
+We approach Hypothesis Testing of the difference of proportion variables in a similar spirit to Section 4.3. We let \(D\) be the difference in sample proportions  generated by samples of size \(n_1,n_2\) from variables with true proportions \(p_1,p_2\). Then our alternative hypothesis take the form of:
+\[ H_A: p_1-p_2<p_0\]
+\[ H_A: p_1-p_2>p_0\]
+\[ H_A: p_1-p_2\ne p_0\]
+We note here \(p_1-p_2=\mu_D\). The null hypothesis for all of these is \( H_0: p_1-p_2=p_0\).
+
+Then, given an observed difference in proportions: \(d=\hat p_1-\hat p_2\)  we compute the \(p\)-values by assuming the null hypothesis \(p_1-p_2=p_0\) and then computing:
+    \[P(D<d)\]
+    \[P(D>d)\]
+    \[P(|D-p_0|<|d-p_0|)\]
+depending on which alternative hypothesis you have chosen.
+Note that we compute these by finding the areas of a right, left or both tails as in section 4.3.
+
+### Remark 5.2.7.  
+If both populations have the same proportion, then we may as well treat it as one big population. So if we take samples of size \(n_1,n_2\) and have “successes” \(x_1,x_2\), then compute a “pooled” sample proportion:
+ \[ \hat p_{pool}=\frac{x_1+x_2}{n_1+n_2}\]
+We then use this pooled proportion as both \(\hat p_1\)
+ and \(\hat p_2\)  for the purpose of computing the standard error.
+
+So we would use
+ \[SE_D = \sqrt{\frac{p_{pool}(1-p_{pool})}{n_1}+\frac{p_{pool}(1-p_{pool})}{n_2}}.\]
+ 
+ ### Activity 5.2.5. Gender and Raises: Hypothesis Test.
+ Recall that from Exploration 5.2.1 that we have \(n_1=312\) men and \(n_2=216\) women, of whom \(x_1=72\) men and \(x_2=30\) women got raises. The company claims that men and women have equal raise rates. The watchdog group claims that men get more raises than women. Suppose we use a \(\alpha = 0.05\) level of significance.
+ 
+(a) Which of the following best describes the null hypothesis ?
+\[p_1-p_2<0\]
+\[p_1-p_2>0\]
+\[p_1-p_2\neq 0\]
+\[p_1-p_2=0\]
+
+(b) Which of the following best describes the alternative hypothesis ?
+\[p_1-p_2<0\]
+\[p_1-p_2>0\]
+\[p_1-p_2\neq 0\]
+\[p_1-p_2=0\]
+
+(c) Compute \(p_{pool}\).
+```{r}
+p_1 = 72/312
+p_2 = 30/216
+p_pool = (72+31)/(312+2)
+
+```
+
+(d) Assuming the null hypothesis compute \(\mu_D, SE_D\).
+```{r}
+mu_D = 0
+SE_D = sqrt(p_pool*(1-p_pool)*(1/312+1/216))
+```
+
+(e) Compute \(d=\hat p_1-\hat p_2\), the difference in proportions of men and women who got raises.
+```{r}
+observed_diff = p_1-p_2
+observed_diff
+```
+
+(f) Let \(X\) be the normal variable mean \(\mu_D\) and standard deviation \(SE_D\). Compute \(P(D>p_0+|p_0-d|)\).
+```{r}
+pnorm(observed_diff, mean = mu_D, sd = SE_D, lower.tail = FALSE)
+```
+The above value is the \(p\)-value. (This is an area of one tail.)
+(g) Compute the \(z\)-score for \(\hat p\), call this \(z_{\hat p}\).
+```{r}
+z_hatp = (observed_diff-mu_D)/SE_D
+print(z_hatp)
+```
+
+(h) Let \(Z\) denote the standard normal variable. Compute \(P(Z>|z_{\hat p}|)\) and \(P(Z<-|z_{\hat p}|)\). How do these values compare to what you found in (f)?
+```{r}
+pnorm(abs(z_hatp),0,1,lower.tail = FALSE)
+pnorm(-abs(z_hatp),0,1,lower.tail = TRUE)
+```
+
+(i) What is the \(p\)-value?
+
+(j) State the meaning of the \(p\)-value within the context of this problem in a complete sentence.
+
+(k) Do we reject the null hypothesis?
+
+(l) What sort of error could have been made? (Type 1 or Type 2)
+
+(m) Run the following code to `sample num_men=312` men where  get raises, then sample `num_women=216` women where  get raises. It does this `trials=1000` times and plots a histogram of the differences.
+```{r}
+trials=1000
+num_men=312
+num_women=216
+m_raise=72
+w_raise=30
+
+raise_rate=(m_raise+w_raise)/(num_men+num_women)
+diffraise=rep(NA, trials)
+
+for(i in 1:trials){
+    menraise=sample(c("RAISE", "NO"), num_men, replace=TRUE, prob=c(raise_rate, 1-raise_rate))
+    womenraise=sample(c("RAISE", "NO"), num_women, replace=TRUE, prob=c(raise_rate, 1-raise_rate))
+    diffraise[i]=length(which(menraise=="RAISE"))/num_men-length(which(womenraise=="RAISE"))/num_women
+}
+hist(diffraise, breaks=25, prob=TRUE)
+```
+
+(n) Fix and run the following code to plot a normal curve with mean `mu_D=` and standard deviation `SE_D=`, and plot a line for the observed difference `observed_diff=`
+```{r}
+# mu_D=FIXME
+# SE_D=FIXME
+# observed_diff=FIXME
+
+hist(diffraise, breaks=25, prob=TRUE)
+curve(dnorm(x, mean=mu_D, sd=SE_D), col="darkblue", lwd=2, add=TRUE, yaxt="n")
+abline(v = observed_diff, col="red", lwd=3, lty=2)
+
+```
+How well does this curve match the histogram?
+
+(o) Run the following code to see what proportion of these differences are greater than or equal to the observed_diff. How does this compare to the \(p\)-value?
+```{r}
+length(which(diffraise>=observed_diff))/trials
+```
+
+### Activity 5.2.6. Study Guide and Exam Pass Rates. 
+Suppose that a group of student's are studying for the notoriously difficult probability Actuarial exam. A publishing company claim's it's materials raises the average pass rate by more than 10%. A Math professor is skeptical of this claim. Suppose that out of out of 30 people who used the material, 15 passed and 40 people who didn't use the material, 14 passed.
+
+Let \(p_1\) denote the population proportion of people who used the material and passed, and \(p_2\) denote the population proportion of people who did not use the material and passed.
+
+(a) Which of the following best describes the null hypothesis \(H_0\)?
+\[p_1-p_2<0.1\]
+\[p_1-p_2>0.1\]
+\[p_1-p_2\neq 0.1\]
+\[p_1-p_2=0.1\]
+
+(b) Which of the following best describes the alternative hypothesis \(H_A\)?
+\[p_1-p_2<0.1\]
+\[p_1-p_2>0.1\]
+\[p_1-p_2\neq 0.1\]
+\[p_1-p_2=0.1\]
+
+(c) Find or compute \(n_1, n_2, \hat p_1, \hat p_2\).
+```{r}
+n_1 = FIXME
+n_2 = FIXME
+hatp_1 = FIXME
+hatp_2 = FIXME
+```
+
+(d) Assuming the null hypothesis, follow compute \(\mu_D, SE_D\). Recall that we can't use the pooled data because the null hypothesis is not \(p_1=p_2\).
+```{r}
+mu_D = FIXME
+SE_D = FIXME
+```
+(e) Compute \(d=\hat p_1-\hat p_2\) the difference in proportions of men and women who got raises.
+```{r}
+observed_diff = FIXME
+```
+
+(f) Let \(X\) be the normal variable mean \(\mu_D\) and standard deviation \(SE_D\). Compute the \(p\)-value \(P(X>d)\).
+```{r}
+pnorm(FIXME, mean = FIXME, sd = FIXME, lower.tail = FIXME)
+```
+
+(g) State the meaning of the \(p\)-value within the context of this problem in a complete sentence.
+
+(h) Do we reject the null hypothesis?
+
+(i) What sort of error could have been made? (Type 1 or Type 2)
+
+(j) Is a 10% increase in scores plausible?
+
+### Activity 5.2.7. Cancer in Dogs.  
+A study in 1994 examined 491 dogs that had developed cancer and 945 dogs as a control group to determine whether there is an increased risk of cancer in dogs that are exposed to the herbicide 2,4-Dichlorophenoxyacetic acid (2,4-D). We analyze their data and see what their conclusion would be.
+Run the following code to download `cancer_in_dogs.csv` and display it's variables.
+```{r}
+cancer = read.csv("https://github.com/TienChih/tbil-stats/raw/main/data/cancer_in_dogs.csv")
+names(cancer)
+```
+
+`order` records whether or not they were exposed to 2,4-D, and `response` records whether or not they got `cancer` or `no cancer`. To see a brief breakdown of the data, run the following code:
+```{r}
+summary(cancer)
+```
+
+Let \(p_1\) denote the probability that a dog exposed to 2,4-D gets cancer and let \(p_2\) denote the proportion of dogs who aren't exposed to 2,4-D who still get cancer.
+
+(a) Which of the following best describes the null hypothesis ?
+\[p_1-p_2<0\]
+\[p_1-p_2>0\]
+\[p_1-p_2\neq 0\]
+\[p_1-p_2=0\]
+
+(b) Which of the following best describes the alternative hypothesis ?
+\[p_1-p_2<0\]
+\[p_1-p_2>0\]
+\[p_1-p_2\neq 0\]
+\[p_1-p_2=0\]
+
+(c) Run the following to show a two-way table of how many dogs were/weren't exposed to 2,4-D and who got/didn't get cancer:
+```{r}
+table(cancer$order, cancer$response)
+```
+
+(d) How many dogs from the sample were exposed to 2,4-D? Out of those dogs, how many got cancer? Let these be \(n_1,x_1\) respectively.
+(e) How many dogs from the sample were not exposed to 2,4-D? Out of those dogs, how many got cancer? Let these be \(n_2,x_2\) respectively.
+(f) Fix and run the following to perform the appropriate proportion hypothesis test. Enter in how many dogs were exposed to 2,4-D and got Cancer, were not exposed to 2,4-D and got Cancer, were exposed to 2,4-D, and weren't exposed to 2,4-D respectively.
+```{r}
+prop.test(c(FIXMEx1, FIXMEx2), c(FIXMEn1, FIXMEn2), 
+        p=NULL, alternative="greater", correct=FALSE)
+```
+
+(g) State the meaning of the \(p\)-value within the context of this problem in a complete sentence.
+
+(h) Do we reject the null hypothesis?
+
+(i) What sort of error could have been made? (Type 1 or Type 2)
+
+(j) Is it plausible to say that being exposed to 2,4-D does not increase the risk of cancer?
+

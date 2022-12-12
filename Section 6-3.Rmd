@@ -1,0 +1,375 @@
+---
+title: "Section 6.3 Paired Numerical Data (N3) "
+author: "Dr. Birgen"
+output: html_notebook
+---
+
+In this section, we consider differences in numerical data between populations where there is a natural pairing between the populations.
+
+### Exploration 6.3.1. UCLA Bookstore vs Amazon. 
+
+The authors of the excellent OpenIntro Statistics text noticed that their text was much more expensive at the UCLA bookstore than on Amazon in 2010. Since then, more bookstores have transitioned to the online model, and have adapted to Amazon's presence in the marketplace. Is there any average difference between UCLA and Amazon prices now?
+
+Run the following code to download the `textbooks.csv` data set which contains information about 73 textbooks sold by both the UCLA bookstore and Amazon, and display the variables: 
+```{r}
+textbooks = read.csv("https://github.com/TienChih/tbil-stats/raw/main/data/textbooks.csv")
+
+names(textbooks)
+```
+
+Click here to learn more about this data set: https://www.openintro.org/data/index.php?data=textbooks.
+
+(a)
+Each row of this data frame represents a textbook sold by both the UCLA bookstore and Amazon. Run the following to display the prices by the UCLA bookstore: 
+```{r}
+textbooks$ucla_new
+```
+
+(b)
+Run the following to display the prices of the same books by Amazon: 
+```{r}
+textbooks$amaz_new
+```
+
+(c)
+Run the following to compute the difference between the two stores for each text: 
+```{r}
+pricediff=textbooks$ucla_new-textbooks$amaz_new
+pricediff
+```
+
+This is a sample of the differences. The true mean difference in textbook costs is denoted: \(\mu_{diff}\).
+
+(d)
+Which of the following best describes the null hypothesis \(H_0\), that on average there is no difference on average between the cost of textbooks from either store?
+*  \(\mu_{diff}\lt \$0\).
+*  \(\mu_{diff}> \$0\).
+*  \(\mu_{diff}\neq \$0\).
+*  \(\mu_{diff}= \$0\).
+
+(e)
+Which of the following best describes the alternative hypothesis \(H_A\), that there is some difference on average between the two stores?
+*  \(\mu_{diff}\lt \$0\).
+*  \(\mu_{diff}> \$0\).
+*  \(\mu_{diff}\neq \$0\).
+*  \(\mu_{diff}= \$0\).
+
+(f)
+Run the following code to display a histogram of the differences between stores: 
+```{r}
+hist(pricediff)
+abline(v = 0, col="red", lwd=3, lty=2)
+```
+
+Based on this graphic, do we think the null hypothesis is plausible?
+
+(g)
+Run the following to show the sample mean and standard deviation of the differences: 
+```{r}
+print(mean(pricediff))
+print(sd(pricediff))
+```
+
+This is a sample mean of the differences, \(\bar{x}_{diff}\), and sample standard deviation of differences \(s_{diff}\).
+
+(h)
+Find the standard error \(SE_{diff}\).
+```{r}
+SE_diff = sd(difference)/sqrt(length(difference))
+SE_diff
+```
+
+(i)
+Find \(t\)-score for \(\bar{x}_{diff}\). Remember that $t=\frac{x-\mu}{SE}$
+```{r}
+t = (mean(pricediff) - 0)/SE
+t
+```
+
+
+(j)
+Compute a \(p\)-value (be sure to use the appropriate level of significance). Remember that the R-command `pt` gives you the area under a t-distribution.
+```{r}
+pt(t,length(pricediff)-1, lower.tail = FALSE)
+```
+
+
+(k)
+State the meaning of the \(p\)-value within the context of this problem in a complete sentence.
+
+
+(l)
+Do we reject the null hypothesis?
+
+(m)
+What sort of error could have been made? (Type 1 or Type 2)
+
+(n)
+Run the following to compute the \(p\)-value another way, how does this compare to what you found above? 
+```{r}
+t.test(pricediff, mu=0, alternative="two.sided")
+```
+
+(o)
+What store do we think charges more on average? Or do we think they're the same?
+
+## Subsection 6.3.1 Paired Data 
+
+### Definition 6.3.1. 
+
+We say two sets of observations from two different populations are paired if:
+*  The observations are of the same size.
+*  There is a special or natural relationship or pairing between each data point of one set and a data point of the other.
+
+So in Exploration 6.3.1 the natural pairing is between prices of the same book.
+
+### Activity 6.3.2. Which are paired? 
+
+For each of the following, describe whether or not the resulting data would be paired. If not, explain why not.
+
+<!-- 1.	A nutritionist studying the effect of a diet takes data from 50 subjects who are on the diet, and a control group of 50 subjects who are not. -->
+<!-- 2.	A pharmacist studying the side-effects of a medication take's 50 patient's vital information one week before taking a medication, and a second time one week after the medication. -->
+<!-- 3.	A social scientist studying gender inequality survey 100 randomly selected men and 100 randomly selected women to complete a survey on wages, salaries and income. -->
+4.	A pharmacist studying the side-effects of a medication take's a patients vital information one week before taking a medication, and a second time one week after the medication.
+5.	A math educator asks 40 students to rate their feelings about certain topics in math before and after a course.
+6.	An engineer at a automotive manufacturer crashes 80 cars with a newly designed safety feature and 80 cars without and measures the damage to the crash-test dummies.
+
+### Remark 6.3.2. Hypothesis Testing and Confidence Intervals with Paired Data. 
+
+If you have a collection of paired data, say \(x_1, x_2, \ldots, x_n\) and \(y_1, y_2, \ldots, y_n\), this gives rise to a natural difference variable \(d=x-y\text{:}\)
+
+|    $x$   	|    $y$   	|      $d$      	|
+|:--------:	|:--------:	|:-------------:	|
+|   $x_1$  	|   $y_1$  	| $d_1=x_1-y_1$ 	|
+|   $x_2$  	|   $y_2$  	| $d_2=x_2-y_2$ 	|
+| $\vdots$ 	| $\vdots$ 	|    $\vdots$   	|
+|   $x_n$  	|   $y_n$  	| $d_n=x_n-y_n$ 	|
+
+The difference between these variables is itself a random variable, with a population mean \(\mu_{d}\) and population standard deviation \(\sigma_{d}\). We can then perform any one variable numerical inference exactly as in we were in Section 6.2. We just have to properly interpret what statements about the difference mean:
+
+*  A C% confidence interval for \(\mu_d\) is an interval that has a C% chance of containing the average difference between our two populations.
+
+*  The null hypothesis \(\mu_d=\mu_0\) is the assumption that the average difference between the two populations could be \(\mu_0\).
+*  The alternative hypothesis \(\mu_d\lt \mu_0\) is the claim that the average difference between the two populations is less than \(\mu_0\).
+*  The alternative hypothesis \(\mu_d> \mu_0\) is the claim that the average difference between the two populations is greater than \(\mu_0\).
+*  The alternative hypothesis \(\mu_d\neq \mu_0\) is the claim that the average difference between the two populations is different from \(\mu_0\).
+
+### Activity 6.3.3. Student Anxiety and COVID-19. 
+
+Ten students were surveyed and were asked to rank their anxiety about school on a scale from 1-10. This was prior to the COVID pandemic. The same students were surveyed again and asked the same question a year later after the pandemic begun. The results are as follows:
+
+| Anxiety pre-Pandemic 	| Anxiety post-Pandemic 	|
+|:--------------------:	|:---------------------:	|
+|           5          	|           7           	|
+|           3          	|           6           	|
+|          10          	|           10          	|
+|           8          	|           9           	|
+|           7          	|           4           	|
+|           8          	|           10          	|
+|           4          	|           4           	|
+|           1          	|           3           	|
+|           7          	|           6           	|
+|           2          	|           2           	|
+
+(a)
+Find the pairwise difference between these observations.
+```{r}
+pre = c(5,3,10,8,7,8,4,1,7,2)
+post = c(7,6,10,9,4,10,4,3,6,2)
+difference = post - pre
+difference
+```
+
+(b)
+Compute the sample mean and standard deviation for the differences \(\bar{x}_d, s_d\).
+```{r}
+mean(difference)
+sd(difference)
+```
+
+(c)
+Suppose we hypothesis that student anxiety went up from pre to post Pandemic. Which of the following best describes the null hypothesis \(H_0\text{?}\) Which the alternative?
+*  \(\mu_d\lt 0\).
+*  \(\mu_d> 0\).
+*  \(\mu_d\neq 0\).
+*  \(\mu_d= 0\).
+
+(d)
+Find the standard error \(SE\).
+```{r}
+SE_diff = sd(difference)/sqrt(length(difference))
+```
+
+(e)
+Find \(t\)-score for \(\bar{x}\).
+```{r}
+t = (mean(difference)-0)/SE
+t
+```
+
+(f)
+Use any method to compute a \(p\)-value (be sure to use the appropriate level of significance). 
+```{r}
+t.test(difference, mu=0, alternative="greater")
+```
+
+(g)
+State the meaning of the \(p\)-value within the context of this problem in a complete sentence.
+
+
+(h)
+Do we reject the null hypothesis?
+
+(i)
+What sort of error could have been made? (Type 1 or Type 2)
+
+(j)
+If instead we wanted to find a 99% confidence interval for \(\mu_d\), find \(t^*\) so that for the appropriate degrees of freedom, \(P(-t^*\lt t\lt t^*)=0.99\). 
+```{r}
+
+```
+
+(k)
+Compute the 99% confidence interval for \(\mu_d\). 
+```{r}
+ t.test(difference, conf.level = .99)$conf.int
+```
+
+(l)
+State what this confidence interval means in the context of this problem using complete sentences.
+
+### Activity 6.3.4. Online Tutoring and Changes in Test Scores. 
+
+The `studentscleaned.csv` data set consists of a sample of 4892 students who have taken a statistics course. It records information such as their gender, major, whether or not they've participated in online statistics tutoring and their scores on the two exams in the course.
+Run the following code to download `studentscleaned.csv` and display it's variables. 
+```{r}
+students = read.csv("https://github.com/TienChih/tbil-stats/raw/main/data/studentscleaned.csv")
+names(students)
+```
+
+(a)
+We are curious to see for students who have done the online tutoring, whether or not on average they will improve from test 1 to test 2. Let \(d\) denote the score from the first test, subtracted from the score from the second test. Which of the following best describes the null hypothesis \(H_0\text{?}\)
+*  \(\mu_d\lt 0\).
+*  \(\mu_d> 0\).
+*  \(\mu_d\neq 0\).
+*  \(\mu_d= 0\).
+(b)
+Which of the following best describes the alternative hypothesis \(H_A\text{?}\)
+*  \(\mu_d\lt 0\).
+*  \(\mu_d> 0\).
+*  \(\mu_d\neq 0\).
+*  \(\mu_d= 0\).
+
+(c)
+We first subset out the students who took online tutoring. Run the following to define `studentstutor`, the subset of students who took online tutoring, and summarize the findings: 
+```{r}
+studentstutor=subset(students, students$online.tutorial==1)
+summary(studentstutor)
+```
+
+(d)
+Run the following code to define the difference of the scores between exams `changeinscore` and display a histogram of the changes, including a line indicating 0 change, and a line indicating the sample average change: 
+```{r}
+changeinscore=studentstutor$score2-studentstutor$score1
+hist(changeinscore)
+abline(v = 0, col="red", lwd=3, lty=2)
+abline(v = mean(changeinscore), col="blue", lwd=3, lty=2)
+```
+
+Based on this graphic, do we think the null hypothesis is plausible?
+
+Fix and run the following code to perform the appropriate hypothesis test and compute a \(p\)-value: 
+```{r}
+t.test(changeinscore, mu=FIXME, alternative="FIXME")
+```
+
+(e)
+State the meaning of the \(p\)-value within the context of this problem in a complete sentence.
+
+(f)
+Do we reject the null hypothesis?
+
+(g)
+What sort of error could have been made? (Type 1 or Type 2)
+
+(h)
+Fix and run the following to compute a 95% confidence interval for \(\mu_d\). 
+```{r}
+t.test(changeinscore, conf.level=FIXME)$conf.int
+```
+
+(i)
+State what this confidence interval means in the context of this problem using complete sentences.
+
+(j)
+Repeat the above for students who did not do the online tutoring.
+```{r}
+
+```
+
+### Activity 6.3.5. Days of Extreme Temperature. 
+
+The National Oceanic and Atmospheric Administration (NOAA) collects data on daily temperatures all across the globe. We are interested in the number of days of extreme temperature at a sample of these locations, and how they may have changed over time.
+
+Run the following code to download `climate70.csv` and display it's variables. 
+```{r}
+climate = read.csv("https://github.com/TienChih/tbil-stats/raw/main/data/climate70.csv")
+names(climate)
+```
+
+We record the Station ID, latitude and logitude of the NOAA stations, the number of days over 70 degrees in 1948 and 2018 at each of these locations, and the number of days over 90 degrees in both years at each of these locations.
+Click here to learn more about this data set: https://www.openintro.org/data/index.php?data=climate70.
+
+(a)
+Let \(d\) denote the number of days over 70 degrees in 1948 subtracted from the number of days over 70 degrees in 2008. We are curious to see if there is any change in the average number of days over 70 degrees from 1948 to 2018. Which of the following best describes the null hypothesis \(H_0\text{?}\)
+*  \(\mu_d\lt 0\).
+*  \(\mu_d> 0\).
+*  \(\mu_d\neq 0\).
+*  \(\mu_d= 0\).
+
+(b)
+Which of the following best describes the alternative hypothesis \(H_A\text{?}\)
+*  \(\mu_d\lt 0\).
+*  \(\mu_d> 0\).
+*  \(\mu_d\neq 0\).
+*  \(\mu_d= 0\).
+
+(c)
+Run the following code to define the difference in number of days over 70 degrees `changeindays70` and display a histogram of the changes, including a line indicating 0 change, and a line indicating the sample average change: 
+```{r}
+changeindays70=climate$dx70_2018-climate$dx70_1948
+hist(changeindays70)
+abline(v = 0, col="red", lwd=3, lty=2)
+abline(v = mean(changeindays70), col="blue", lwd=3, lty=2)
+```
+
+Based on this graphic, do we think the null hypothesis is plausible?
+
+Fix and run the following code to perform the appropriate hypothesis test and compute a \(p\)-value: 
+```{r}
+t.test(changeindays70, mu=FIXME, alternative="FIXME")
+```
+
+(d)
+State the meaning of the \(p\)-value within the context of this problem in a complete sentence.
+
+(e)
+Do we reject the null hypothesis?
+
+(f)
+What sort of error could have been made? (Type 1 or Type 2)
+
+(g)
+Fix and run the following to compute a 95% confidence interval for \(\mu_d\). 
+```{r}
+t.test(changeindays70, conf.level=FIXME)$conf.int
+```
+
+(h)
+State what this confidence interval means in the context of this problem using complete sentences.
+
+(i)
+Repeat the above for days over 90.
+```{r}
+
+```

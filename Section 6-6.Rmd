@@ -1,0 +1,373 @@
+---
+title: "Section 6.6 ANOVA: Analysis of Variation"
+output: html_notebook
+---
+
+In Section 6.4, we compared populations separated into two groups to see if some variable differed on average between the groups. In this section, we will look at comparing across more than two groups.
+Suppose you had variable of interest across $k$ separate populations. So long as the following conditions are met:
+
+*  Observations are independent across groups.
+*  Observations within groups are approximately normal.
+*  Variability across groups is roughly equal.
+Then we may perform ANOVA (Analysis of Variation) to perform a test on the following hypothesis:
+
+*  $H_0:$ The means are the same across groups, that is: $\mu_1=\mu_2\cdots=\mu_k$.
+*  $H_A::$ At least one of the means is different from another.
+
+### Exploration 6.6.1. Batting Average and Position. 
+Is there any difference in batting average between different positions? We examine 1270 players from the 2018 MLB season, and observe their batting average and position: `1B = first base`, `2B = second base`, `3B = third base`, `C = catcher`, `CF = center field (outfield)`, `DH = designated hitter`, `LF = left field (outfield)`, `P = pitcher`, `RF = right field (outfield)`, `SS = shortstop`.
+Run the following code to download the `mlb_players_18.csv` the data set which contains information about 1270 players from the 2018 MLB season and display it's variables: 
+```{r}
+mlb18 = read.csv("https://github.com/TienChih/tbil-stats/raw/main/data/mlb_players_18.csv")
+
+names(mlb18)
+```
+
+Click here to learn more about this data set: https://www.openintro.org/data/index.php?data=mlb_players_18.
+
+(a)
+Since they are special players, let's consider a subset of the players without pitchers or designated hitters. Run the following code to produce `batters` a subset of `mlb18` with no pitchers or designated hitters. 
+```{r}
+batters=subset(mlb18, mlb18$position!="P" & mlb18$position!="DH")
+summary(batters)
+```
+
+(b)
+Run the following code to plot a box-plot for the batting averages of batters separated by position. 
+```{r}
+boxplot(batters$AVG~batters$position)
+```
+
+Is it obvious that these values come from different distributions? Is it obvious they couldn't have?
+
+### Exploration 6.6.2. Randomness. 
+Much like in Exploration 6.4.2, the issue is that it's certainly possible for two different distributions to produce similar looking samples, or for identical distributions to produce very different looking examples.
+
+(a)
+Run the following code to produce a data frame with two variables, a `group` variable with values `A`, `B` and `C`, and a `values` variable that is identical across group, and plot boxplots of values across the groups. 
+```{r}
+group1=c(rep("A", 30), rep("B", 30), rep("C", 30))
+values1=c(rnorm(30,100,35), rnorm(30,100,35), rnorm(30,100,35))
+
+dummy1 = data.frame(group1, values1)
+summary(dummy1)
+boxplot(dummy1$values1~dummy1$group1)
+```
+
+(b)
+Run the following code to produce another data frame with the same variables, but the B group has a different distribution than the others. 
+```{r}
+group2=c(rep("A", 30), rep("B", 30), rep("C", 30))
+values2=c(rnorm(30,100,35), rnorm(30,90,35), rnorm(30,100,35))
+
+dummy2 = data.frame(group2, values2)
+summary(dummy2)
+boxplot(dummy2$values2~dummy2$group2)
+```
+
+## Subsection 6.6.1 Intuition of ANOVA 
+
+### Remark 6.6.1. Idea behind ANOVA. 
+
+The null hypothesis of ANOVA testing is that all of the groups have identical distributions, and the alternative is that they do not. If the null hypothesis were true, then it must follow that all the variation between the groups is driven by the natural variation of the variable itself.
+
+So what we will do is compare the variation between groups, and variation within groups. If the null hypothesis holds, them we would expect that these values are comparable. If there is some discrepancy, then we become more suspicious of the null. As usual, this level of suspicion will be measured with a $p$-value, which measure the probability that: should the null be true that we see the levels of discrepancy or greater than what's observed.
+
+### Activity 6.6.3. Fertilizer and Crop Yields: Variation between Groups. 
+Over the next few activities, we will explore how ANOVA works with a small data set, one that is honestly too small to be considered a serious data set in practice. However, it will allow us to see the inner workings of ANOVA without getting bogged down in huge computations.
+
+A farmer tests 3 types of fertilizer, A, B and C, on her crops. She segments her farmland into different plots, applies one type of fertilizer for each plot, and in the end, records the bushels per acre for that plot. The results are as follows:
+
+| Fertilizer A 	| Fertilizer B 	| Fertilizer C 	|
+|:------------:	|:------------:	|:------------:	|
+|      176     	|      168     	|      177     	|
+|      173     	|      171     	|      179     	|
+|      175     	|      172     	|      173     	|
+|      179     	|              	|      176     	|
+|              	|              	|      181     	|
+
+(a)
+Compute $\bar{x}$ the overall sample mean production rate for all 12 plots. 
+```{r}
+FertA = c(176,173,175,179)
+FertB = c(167,171,172)
+FertC = c(177,179,173,176,181)
+n1 = length((FertA))
+n2 = length((FertB))
+n3 = length((FertC))
+barx = mean(c(FertA, FertB, FertC))
+barx
+```
+
+
+(b)
+Compute $\bar{x}_1$ the sample mean production rate for Fertilizer A. Repeat for $\bar{x}_2$ for Fertilizer B and $\bar{x}_3$ for Fertilizer C. 
+```{r}
+barx1 = mean(FertA)
+barx2 = mean(FertB)
+barx3 = mean(FertC)
+```
+
+(c)
+Now that we have the overall mean, and the mean of each group, we compute the “variation” among the groups.
+
+Compute $n_1(\bar{x}_1-\bar{x})^2+n_2(\bar{x}_2-\bar{x})^2+n_3(\bar{x}_3-\bar{x})^2$, where $n_i$ is the size of the appropriate group. This computes the “difference” from each groups mean from the overall mean, squared to remove signs, and weighted for the size of the group. Call this value $SSG$ or the “sum of squares for groups”.
+```{r}
+SSG = n1*(barx1 - barx)^2 +
+    n2*(barx2 - barx)^2 +
+    n3*(barx3 - barx)^2
+SSG
+    
+```
+
+(d)
+Since there are $k=3$ groups, the degrees of freedom for groups: $df_G$ is $k-1=3-1=2$. Compute the “mean square for groups”: $MSG=\frac{SSG}{df_G}.$
+```{r}
+df_G = 3-1
+MSG = SSG/df_G
+MSG
+```
+
+This value measure the variation between groups, normalized for the number of groups. (If there were a lot of groups, we would see a lot of variation even if they were distributed identically, so we account for that.)
+
+### Activity 6.6.4. Fertilizer and Crop Yields: Variation within Groups. 
+We now continue from Activity 6.6.3 to analyze variation within groups.
+
+(a)
+Luckily there is a statistic which measures variation (it's implied by the name). Compute $Var_1$, the sample variance for the yield rates for Fertilizer A. Repeat for $Var_2, Var_3$. 
+```{r}
+Var1 = var(FertA)
+Var2 = var(FertB)
+Var3 = var(FertC)
+```
+
+(b)
+Now that we have the variance within each group, we compute the the total variation.
+Compute $(n_1-1)Var_1+(n_2-1)Var_2+(n_3-3)Var_1$. This computes the total variance within groups, weighted for the size of the group. Call this value $SSE$ or the “sum of squares for errors”.
+```{r}
+SSE = (n1-1)*Var1 +
+    (n2-1)*Var2 +
+    (n3-1)*Var3
+SSE
+```
+
+(c)
+Compute the “degrees of freedom for errors” by summing the degrees of freedom for each group: $df_{E}=(n_1-1)+(n_2-1)+(n_3-1).$
+```{r}
+df_E = (n1-1) + (n2-1) + (n3-1)
+```
+
+(d)
+Compute the “mean square error”: $MSE=\frac{SSE}{df_E}.$
+This value measure the variation within groups, normalized by the size of the groups.)
+```{r}
+MSE = SSE/df_E
+MSE
+```
+
+### Activity 6.6.5. Fertilizer and Crop Yields: $F$-statistic and $p$-value. 
+
+We continue from Activity 6.6.4 to produce a $p$-value.
+
+(a)
+Compute $F=\frac{MSG}{MSE}$. This is a comparison between the variation between groups and the variation within groups.
+```{r}
+Fcalc  = MSG/MSE
+Fcalc
+```
+
+(b)
+The $F$-distribution is a random variable who has two parameters, d_f1 and d_f2 two sets of degrees of freedom. We compute the proportion of the distribution greater than $F$ where d_f1$=df_G$, d_f2$=df_E$.
+Adjust the values for d_f1, d_f2 and F to compute the $p$-value p. 
+```{r}
+pf(Fcalc, df1 =df_G, df2 =df_E, lower.tail = FALSE)
+```
+
+
+### Remark 6.6.2. 
+The details of the $F$ distribution are extremely technical. This is what you should take away: $F=\frac{MSG}{MSE}$, where $MSG$ measure the variability between groups and $MSE$ measure the variability within groups.
+
+*  If $MSE$ is big compared to $MSG$ then there is a lot of variability within groups. This variability easily explains the variability between the groups. Thus $F$ is small, and the tail, and thus $p$-value, is big. We fail to reject the null because the variability within groups plausibly explains our data.
+*  On the other hand, if $MSG$ is big compared to $MSE$, then there is a lot of variability between groups. More than the natural variation can explain. There is likely some actual differences between the groups. In these cases, $F$ is big, the tails are small and so are the $p$-values. We reject the null (when $p$-value $\lt 0.05$) when it's no longer plausible that natural variation within groups can explain our data.
+
+### Remark 6.6.3. Recap of ANOVA. 
+
+To recall the steps of ANOVA from Activity 6.6.3, Activity 6.6.4 and Activity 6.6.5: suppose that we have a $n$ total observations from $k$ different groups. There are $n_i$ observations from group $i$. We then:
+
+1.	Compute $\bar{x}$ the overall sample mean.
+2.	Compute $\bar{x}_i$ the sample mean for each group.
+3.	Compute $SSG=\sum n_i(\bar{x}_i-\bar{x})^2$ the sum of squares for groups.
+4.	Compute $df_G=k-1$ the degrees of freedom for groups.
+5.	Compute $MSG=\frac{SSG}{df_G}$ the mean squares for groups.
+6.	Compute $Var_i$ for each group.
+7.	Compute $SSE=\sum (n_i-1)Var_i$ the sum of squares for errors.
+8.	Compute $df_E=\sum (n_i-1)=n-k$ the degrees of freedom for errors.
+9.	Compute $MSE=\frac{SSE}{df_E}$ the mean squares for errors.
+10.	Compute $F=\frac{MSG}{MSE}$ the $F$ statistic.
+11.	Compute $P(F\lt X)$ where $X$ is a $F$ distributed variable with parameters $df_G, df_E$. This value is the $p$-value.
+12.	Reject the null hypothesis if $p$-value $\lt 0.05$.
+13.	Marvel that even for statistics, this is a lot of computation.
+
+## Subsection 6.6.2 ANOVA and R 
+
+### Remark 6.6.4. 
+Note that none of the steps in Remark 6.6.3 are particularly difficult, just long and tedious. But they're fairly straightforward tasks, and one can automate much of the work. By entering the group sizes, sample means and sample standard deviations into `N`, `M`, `S` in Desmos, one can compute all the necessary values.
+
+But we could automate more than that.
+
+### Activity 6.6.6. Fertilizer and Crop Yields: R. 
+
+We can use commands in R to do ANOVA directly from data.
+
+(a)
+Run the following code to produce a data-frame crops with variables yield and fertilizer. 
+```{r}
+fertilizer=c("A", "A", "A", "A", "B", "B", "B", 
+  "C","C","C","C","C")
+yield=c(176, 173, 175, 179, 168, 171, 172, 177, 179, 173, 176, 181)
+
+crops = data.frame(yield, fertilizer)
+```
+If you already have the data entered as before, you can use the following to convert it to a useful data frame:
+```{r}
+fertilizer1 = rep(c("A", "B", "C"), times = c(n1,n2,n3))
+yield1 = c(FertA, FertB, FertC)
+
+crops1 = data.frame(yield1, fertilizer1)
+```
+Notice that `crops` and `crops1` are identical:
+```{r}
+crops
+crops1
+```
+
+(b)
+Run the following code to create an `aov` model of `crops` and summarize it. The symbol `~` is telling the command that `crops` is a function of `fertilizer`. We will see more of this in the next chapter.
+```{r}
+cropsaov=aov(yield~fertilizer, data=crops)
+summary(cropsaov)
+```
+How do these values compare to what we found before?
+
+(c)
+State the meaning of the $p$-value within the context of this problem in a complete sentence.
+
+(d)
+Do we reject the null hypothesis?
+
+(e)
+What sort of error could have been made? (Type 1 or Type 2)
+
+### Activity 6.6.7. Batting Average and Position: R. 
+We can finish what we started with Exploration 6.6.1.
+(a)
+Run the following code to re-plot a box-plot for the batting averages of batters separated by position. 
+```{r}
+boxplot(batters$AVG~batters$position)
+```
+
+(b)
+Run the following code to create an `aov` model of `batters` and summarize it. 
+```{r}
+battersaov=aov(AVG~position, data=batters)
+summary(battersaov)
+```
+
+(c)
+State the meaning of the $p$-value within the context of this problem in a complete sentence.
+
+(d)
+Do we reject the null hypothesis?
+
+(e)
+What sort of error could have been made? (Type 1 or Type 2)
+
+### Activity 6.6.8. Relaxation and Degree Attainment: R. 
+
+Is there any impact on degree attainment and the amount of time spent relaxing?
+
+Run the following code to download the `gss2010.csv` data set which contains information from the 2010 social survey and display it's variables: 
+```{r}
+gss2010 = read.csv("https://github.com/TienChih/tbil-stats/raw/main/data/gss2010.csv")
+
+names(gss2010)
+```
+
+Click here to learn more about this data set: https://www.openintro.org/data/index.php?data=gss2010.
+
+(a)
+Run the following code to rplot a box-plot for the hours of relaxation in a day separated by degree attainment. 
+```{r}
+boxplot(hrsrelax ~ degree, data=gss2010)
+```
+
+(b)
+Run the following code to create an `aov` model of `gss2010` and summarize it. 
+```{r}
+relaxaov=aov(hrsrelax ~ degree, data=gss2010)
+summary(relaxaov)
+```
+
+(c)
+State the meaning of the $p$-value within the context of this problem in a complete sentence.
+
+(d)
+Do we reject the null hypothesis?
+
+(e)
+What sort of error could have been made? (Type 1 or Type 2)
+
+(f)
+`mntlhlth` measures “For how many days during the past 30 days was your mental health, which includes stress, depression, and problems with emotions, not good?”
+
+Re-run the above comparing this variable across degree attainment.
+```{r}
+
+```
+
+(g)
+`hrs1` measures “Hours worked each week.”
+Re-run the above comparing this variable across degree attainment.
+```{r}
+
+```
+
+### Activity 6.6.9. Starbucks Nutrition and Item Type: R. 
+
+Is there any impact on the type of item Starbucks serves, `bakery`, `bistro box`, `hot breakfast`, `parfait`, `petite`, `salad`, `sandwich`, and nutrition?
+Run the following code to download `starbucks.csv` a data set containing information about 77 Starbucks menu items their nutritional value and show it's variable names. 
+```{r}
+starbucks = read.csv("https://github.com/TienChih/tbil-stats/raw/main/data/starbucks.csv")
+
+names(starbucks)
+```
+
+Click here to learn more about this data set: https://www.openintro.org/data/index.php?data=Starbucks.
+(a)
+Run the following code to rplot a box-plot for `fiber` in g, separated by food type type. 
+```{r}
+boxplot(fiber ~ type, data=starbucks)
+```
+
+(b)
+Run the following code to create an `aov` model of `starbucks` and summarize it. 
+```{r}
+starbucksaov=aov(fiber ~ type, data=starbucks)
+summary(starbucksaov)
+```
+
+(c)
+State the meaning of the $p$-value within the context of this problem in a complete sentence.
+
+(d)
+Do we reject the null hypothesis?
+
+(e)
+What sort of error could have been made? (Type 1 or Type 2)
+
+(f)
+Re-run the above comparing another nutritional variable across food type
+```{r}
+
+```
+

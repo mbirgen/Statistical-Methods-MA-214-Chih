@@ -1,0 +1,396 @@
+---
+title: "Size of Samples of Numerical Variables"
+output: html_notebook
+---
+
+In often, gathering data, conducting experiments or studies, and performing statistical analysis can be time consuming, arduous or expensive. If we wish to achieve a certain level of precision in our results, we need samples of sufficient size. We've done this for categorical variables in Section 5.1 In this section, we estimate the minimum size of a sample which will provide the precision of our choice for numerical variables.
+
+## Subsection 6.5.1 Sample Size and Margins of Error 
+
+### Remark 6.5.1. 
+
+In Remark 6.2.1 we spoke about computing confidence intervals for the means of numerical variables. Recall from Definition 5.1.2 that the margin of error for a confidence interval is the distance from the endpoints of the interval to it's center, or \(\frac{UB-LB}{2}\). Since a numerical confidence interval is computed as:
+$ \left[\bar{x}-t^*\frac{s}{\sqrt{n}}, \bar{x}+t^*\frac{s}{\sqrt{n}}\right] $ 
+from Remark 6.2.1, the margin of error of a numerical confidence interval is
+$ME=t^*\frac{s}{\sqrt{n}}. $
+ 
+But note from Definition 6.1.4 that as \(n\) increases, the \(t\)-distribution greatly resembles the normal distribution. In other words \(t^*\approx z^*\).
+
+Activity 6.5.1. 
+
+Here, we walk through the steps of finding the sample size to estimate a confidence interval within a given margin of error.
+Suppose you sample a numerical variable and found a sample standard deviation \(s=25\). We want to find a sample size \(n\) so that we can take a sample of size \(n\) and get a 95% confidence interval with margin of error \(ME=3\).
+```{r}
+s = 25
+ME = 3
+```
+
+(a)
+Find \(z^*\) such that \(P(-z^*\lt Z\lt z^*)=0.95\) where \(Z\) is the standard normal variable. 
+
+```{r}
+zstar = qnorm((1-0.95)/2, lower.tail = FALSE)
+zstar
+```
+
+Also see Remark 4.2.5.
+
+(b)
+Recall from Activity 6.5.1 that
+$ ME=t^*\frac{s}{\sqrt{n}}. $
+Using \(t^*=z^*, s=25\) and \(ME=3\), solve for \(n\).
+
+(c)
+How large should your sample size be to get a 95% confidence interval with margin of error at least \(3\text{?}\) (It should be a whole number).
+```{r}
+n = (zstar*s/ME)^2
+n
+ceiling(n)
+```
+
+(d)
+Repeat the above tasks for a 99% confidence interval.
+```{r}
+zstar = qnorm((1-0.95)/2, lower.tail = FALSE)
+zstar
+n = (zstar*s/ME)^2
+n
+ceiling(n)
+```
+
+### Remark 6.5.3. 
+Note that if we have
+$ME=z^*\frac{s}{\sqrt{n}}$
+it follows algebraically:
+$n=\frac{(z^*s)^2}{ME^2}.$
+
+### Activity 6.5.2. Confidence Intervals for Average Test Scores. 
+Let's put this in practice. Recall that for \(s\) to be good estimate for \(\sigma\) and \(z^*\) to be a good estimate for \(t^*\), the sample size should be at least 30.
+
+The `studentscleaned.csv` data set consists of a sample of 4892 students who have taken a statistics course. It records information such as their gender, major, whether or not they've participated in online statistics tutoring and their scores on the two exams in the course.
+
+Run the following code to download `studentscleaned.csv` and display it's variables. 
+```{r}
+students = read.csv("https://github.com/TienChih/tbil-stats/raw/main/data/studentscleaned.csv")
+names(students)
+```
+
+Our goal will be to find a confidence interval for the average score of Exam 1 with margin of error 2 points.
+```{r}
+ME = 2
+```
+
+(a)
+Run the following code to sample 30 scores from Exam 1: 
+```{r}
+samp1=sample(students$score1, 30)
+```
+
+(b)
+Run the following code to find a sample standard deviation: 
+```{r}
+s=sd(samp1)
+s
+```
+You will get a different value than everyone else because we are sampling.
+
+(c)
+Find \(z^*\) such that \(P(-z^*\lt Z\lt z^*)=0.95\) where \(Z\) is the standard normal variable. 
+```{r}
+zstar = qnorm((1-.95)/2,  lower.tail = FALSE)
+zstar
+```
+
+(d)
+Recall from Activity 6.5.1 that
+$ME=t^*\frac{s}{\sqrt{n}}.$
+Using \(t^*=z^*, s\) and \(ME=2\), solve for \(n\).
+```{r}
+n = (zstar * s/ME)^2
+```
+
+(e)
+How large should your sample size be to get a 95% confidence interval with margin of error at least 2? (It should be a whole number).
+```{r}
+ME = 2
+n = (tstar*s/ME)^2
+n
+n1 = ceiling(n)
+n1
+```
+
+(f)
+Fix and run the following code to sample n scores from Exam 1, and compute a 95% confidence interval: 
+```{r}
+n=n1
+
+samp2=sample(students$score1, n)
+t.test(samp2, conf.level=0.95)$conf.int
+```
+
+What is the margin of error? (Recall that \(s\) was just an estimator for \(\sigma\).)
+
+(g)
+Repeat the above for Exam 2.
+```{r}
+samp2=sample(students$score2, 30)
+s=sd(samp2)
+ME = 2
+n = (tstar*s/ME)^2
+n
+n2 = ceiling(n)
+n2
+```
+
+## Subsection 6.5.2 Power Calculations for difference of Means 
+
+We know from the computation of the standard error that the larger the sample size, the smaller the standard error. A moderate sample may be able to detect moderate differences in means, but be unable to detect smaller differences. For that, we would need to find a bigger sample.
+
+### Activity 6.5.3. Blood Pressure and Medication. 
+A team of medical researchers want to study the effects of two different medications on blood pressure, A and B. They're interested to see if there is any difference in average blood pressure of patients who take either medication. Prior research suggests that the standard deviation of blood pressure for patients who take either medication will be 12mmHG. They test the drug on patients with two groups of 100 each. Unbeknownst to the researchers, medication B lowers blood pressure by 3 mmHG on average.
+```{r}
+n_1 = 100
+n_2 = 100
+s = 12
+mu_2 = 3
+```
+
+
+(a)
+Which of the following best describes the null hypothesis \(H_0\text{?}\)
+•	\(\mu_1-\mu_2\lt 0\) mmGH.
+•	\(\mu_1-\mu_2> 0\) mmGH.
+•	\(\mu_1-\mu_2\neq 0\) mmGH.
+•	\(\mu_1-\mu_2= 0\) mmGH.
+(b)
+Which of the following best describes the alternative hypothesis \(H_A\text{?}\)
+•	\(\mu_1-\mu_2\lt 0\) mmGH.
+•	\(\mu_1-\mu_2> 0\) mmGH.
+•	\(\mu_1-\mu_2\neq 0\) mmGH.
+•	\(\mu_1-\mu_2= 0\) mmGH.
+(c)
+Assume that \(s_1=12=s_2\). Find the standard error \(SE\).
+```{r}
+SE = s/sqrt(n_1)
+```
+
+(d)
+Suppose that, surprise surprise! The results are back and \(\bar{x}_1-\bar{x}_2=3\). Find \(t\)-score for \(\bar{x}_1-\bar{x}_2\).
+```{r}
+xbar_D = 3
+t = (xbar_D - FIXME)/FIXME
+t
+```
+
+(e)
+Compute a \(p\)-value (be sure to use the appropriate level of significance). 
+```{r}
+df = FIXME
+pt(t,df,lower.tail = FALSE)*2
+```
+
+(f)
+Do we reject the null hypothesis?
+
+(g)
+What sort of error did we make? (Type 1 or Type 2)
+
+The issue of course is that this difference between medications A and B is potentially important and we would like to know it!
+
+### Activity 6.5.4. Blood Pressure and Medication: Power Computation. 
+
+There is of course some chance that with 100 people in each group, that just by sheer chance the blood pressures are such that the null hypothesis can be rejected. What are the chances of this?
+For simplicity sake, we will assume that this sample size allows a normal distribution to be utilized in place of a \(t\)-distribution.
+
+(a)
+Recall that for a normal distribution with mean \(\mu=0\) and standard deviation \(SE\) that 95% of the distribution falls between \(-1.96SE, 1.96SE\). Compute these values with the \(SE\) we found in Activity 6.5.3.
+```{r}
+-1.96*SE_D
+1.96*SE_D
+```
+
+(b)
+Recall that we reject the null hypothesis if \(\bar{x}_1-\bar{x}_2\) falls into the 2.5% tail regions. For what values of \(\bar{x}_1-\bar{x}_2\) would we actually reject the null?
+
+(c)
+But note that the actual sampling distribution would be centered at \(\mu_1-\mu_2=-3\).
+So what's the probability that this study would actually have statistically significant results? Compute \(P(Y\lt -1.96SE)\) where \(-1.96SE\) as we've already computed, and \(Y\) is the sampling distribution, a normal variable with mean \(-3\) and standard deviation \(SE\). 
+```{r}
+pnorm(-1.96*SE_D, mean = -3, sd = SE_D, lower.tail = TRUE)
+```
+
+
+This probability is called the power of the test for a difference of \(-3\).
+
+(d)
+To see what an actual study would look like, run the following code to sample `n1=100`, `n2=100` people from two distributions where the mean is different by 3, and see if we can reject the null hypothesis. 
+```{r}
+n1=100
+n2=100
+
+sampA=rnorm(n1, 135, 12)
+sampB=rnorm(n2, 132, 12)
+boxplot(sampA, sampB)
+t.test(sampA, sampB, alternative="two.sided")
+```
+
+(e)
+Run the following code to simulate 1000 trials of this medication with 100 subjects in each group, and record the p.value from each trial, and display a histogram of the results. 
+```{r}
+n1=100
+n2=100
+trials=1000
+
+pvec=rep(NA, trials)
+
+for(i in 1:trials){
+  sampA=rnorm(n1, 135,12)
+  sampB=rnorm(n2, 132, 12)
+  pvec[i]=t.test(sampA, sampB, alternative="two.sided")$p.value
+}
+
+hist(pvec, breaks=25)
+abline(v = 0.05, col="red", lwd=3, lty=2)
+```
+Then run the following to see what proportion of the time we reject the null: 
+```{r}
+length(which(pvec < 0.05))/trials
+```
+
+
+How does this value compare to the power of the test which you computed in (c)?
+
+### Remark 6.5.6. 
+So, this isn't fantastic. Turns out there is a real difference in the efficacy of these two medications, but it's simply to small for our study to reliably detect. The researchers may not know that this difference in the medication exists, but they're certainly aware that something like this could be an issue.
+
+The problem fundamentally is that the standard error \(SE\) is simply too large, and the test is thus insensitive to this difference. Since
+$SE=\sqrt{\frac{s_1^2}{n}+\frac{s_2^2}{n}}$
+we could shrink the standard error by increasing \(n\) and taking a larger sample. But we can't just keep testing bigger and bigger groups, there are time and financial limitations. Also the researchers don't know there is a difference to be found, and don't want their time looking for a difference that doesn't exist.
+
+Activity 6.5.5. Medication and Blood Pressure: Sample Size. 
+
+The researchers decide to give the experiment one more chance, and they want to recruit enough subjects to that if there is a difference of 3 mmGH, there is an 80% chance that they detect it. In other words, they want to solve for \(n\) for a power of 80%.
+
+(a)
+So if there was a difference of 3 mmGH, the sampling distribution would have mean \(\mu_1-\mu_2=-3\) as in Activity 6.5.4. Find a \(z^*\) so that \(P(Z\lt z^*)=0.8\), where \(Z\) is the standard normal variable.
+```{r}
+zstar = qnorm(0.8, mean = 0, sd = 1, lower.tail = TRUE)
+zstar
+```
+
+(b)
+For these values to be statistically significant, they have to be less than \(-1.96SE\): 
+ 
+Figure 6.5.8. 80% tail is statistically significant.
+Find \(SE\) so that \(-3+z^*SE=-1.96SE.\)
+```{r}
+SE = FIXME
+```
+
+(c)
+Using the fact that \(SE=\sqrt{\frac{s_1^2}{n}+\frac{s_2^2}{n}}\) and \(s_1=12=s_2\), solve for \(n\).
+```{r}
+n = SE^2*(FIXME)
+
+```
+
+(d)
+How many people should be recruited to test each medication? Recall this must be a whole number.
+```{r}
+ceiling(n)
+```
+
+(e)
+Fix and run the following code to simulate 1000 trials of this medication with n subjects in each group, and record the p.value from each trial, and display a histogram of the results. 
+```{r}
+n=FIXME
+trials=1000
+
+pvec=rep(NA, trials)
+
+for(i in 1:trials){
+  sampA=rnorm(n, 135,12)
+  sampB=rnorm(n, 132, 12)
+  pvec[i]=t.test(sampA, sampB, alternative="two.sided")$p.value
+}
+
+hist(pvec, breaks=25)
+abline(v = 0.05, col="red", lwd=3, lty=2)
+```
+
+Then run the following to see what proportion of the time we reject the null: 
+```{r}
+length(which(pvec < 0.05))/trials
+```
+
+How does this value compare to the power of 80% we hoped to achieve?
+
+(f) Convince yourself that if patients taking medication B had on average blood pressure 3 mmGH higher than those on medication A, that a sample size each of \(n\) would also allow you to detect it 80% of the time.
+
+### Remark 6.5.9. 
+Note that in practice, one rarely knows what the actual \(\mu_1, \mu_2\) were (and if you did, there would be no need to run experiments!). But what we've done in Activity 6.5.5 is show that should there be a difference of 3 mmGH, we would be able to detect it 80% of the time with sample sizes of size \(n\).
+
+### Remark 6.5.10. 
+Following Activity 6.5.4, given a hypothesis test where
+$H_A: \mu_1-\mu_2\neq 0, H_0 \mu_1-\mu_2 = 0$
+and the null distribution has standard error \(SE\) (as computed via Remark 6.4.1), the power of a difference \(\mu_d \lt 0\) is the probability that this hypothesis test is able to detect a difference of \(\mu_1-\mu_2=\mu_d\).
+
+We compute the power to be \(P(Y\lt -1.96SE)\) where \(Y\) is a normal variable with mean \(\mu_d\) and standard deviation SE. 
+
+### Remark 6.5.11. 
+Following Activity 6.5.5, given a difference \(\mu_d \lt 0\) and a power \(P\) of \(\mu_d \lt 0\), we compute the following to obtain a sample size which will give us this power for the test and difference.
+1.	Find \(z^*\) so that \(P(Z\lt z^*)=P\) where \(Z\) is the standard normal variable.
+2.	Set \(\mu_d+z^*SE=-1.96SE\) and solve for \(SE\).
+3.	Use \(SE=\sqrt{\frac{s_1^2}{n}+\frac{s_2^2}{n}}\) to solve for \(n\). Remember to then round \(n\) up.
+
+Activity 6.5.6. Student Evaluations and Gender Bias. 
+An education researcher is studying gender bias in student valuations. Student evaluations are score from 1-5 and generally are distributed with standard deviation 1.1 (regardless of gender). They are looking to recruit an equal number of men and women to observe any average difference in the evaluations. They want to be able to detect at least a 0.25 difference in average scores.
+(a)
+Follow Remark 6.5.10 to compute the power of this hypothesis test for a difference of \(0.25\) if they recruit 50 men and 50 women to the study. 
+```{r}
+sigma = 1.1
+mu_d = -0.25
+n = 50
+SE = sqrt(sigma^2/n + sigma^2/n)
+pnorm(-1.96*SE, mean = mu_d, sd = SE, lower.tail = TRUE)
+```
+
+(b)
+Explain what this power represents in the context of this problem using complete sentences.
+
+(c)
+How many participants of both genders would need to be recruited to achieve a power of 90% for the 0.25 difference? Follow Remark 6.5.11. 
+```{r}
+P = 0.90
+zstar = qnorm(P, mean = 0, sd = 1, lower.tail = TRUE)
+SE = (-mu_d)/(zstar + 1.96)
+n = 2 * (sigma/SE)^2
+ceiling(n)
+```
+
+
+### Activity 6.5.7. Time Spent in Data Entry. 
+A nonprofit organization wants to test which data-entry system saves the most time for their volunteers. They recruit an equal number of volunteers to test systems A and B. The standard deviation of time spent in data entry is 45 minutes for both methods. Suppose they wish to detect a difference of 15 minutes.
+
+(a) Follow Remark 6.5.10 to compute the power of this hypothesis test for a difference of 15 minutes if they recruit 40 people for each method. 
+```{r}
+sigma = FIXME
+mu_d = FIXME 
+n = FIXME
+SE = sqrt(sigma^2/n + sigma^2/n)
+pnorm(-1.96*SE, mean = mu_d, sd = SE, lower.tail = TRUE)
+```
+
+(b)
+Explain what this power represents in the context of this problem using complete sentences.
+
+(c)
+How many participants for both methods would need to be recruited to achieve a power of 85% for the 15 minute difference? Follow Remark 6.5.11. 
+Hint. Desmos
+```{r}
+P = FIXME
+zstar = qnorm(P, mean = 0, sd = 1, lower.tail = TRUE)
+SE = (-mu_d)/(zstar + 1.96)
+n = 2 * (sigma/SE)^2
+ceiling(n)
+```

@@ -1,0 +1,437 @@
+---
+title: "Inference for Single Numerical Variables"
+author: "Dr. Birgen"
+output: html_notebook
+---
+# Section 6.2 Confidence Intervals and Hypothesis Testing for a single Numerical Variable (N2) 
+In this section, we apply the concepts of confidence intervals and hypothesis testing to numerical rather than categorical variables.
+
+## Subsection 6.2.1 Confidence Intervals 
+
+### Remark 6.2.1. 
+Recall Definition 4.2.1. For a numerical variable in particular, a C% confidence interval is an interval \([L, U]\) so that the true mean of the variable, \(\mu\),  has a C% chance of lying within the interval.
+For a numerical sample of size \(n\) with sample mean \(\bar{x}\) and sample standard deviation \(s\),  we recall that the standard error is \(SE=\frac{s}{\sqrt{n}}\). Thus, we can compute a C% confidence interval via
+$\left[\bar{x}-t^*SE, \bar{x}+t^*SE\right]=\left[\bar{x}-t^*\frac{s}{\sqrt{n}}, \bar{x}+t^*\frac{s}{\sqrt{n}}\right]$ 
+where \(t^*\) is the \(t\) value so that \(P(-t^*\lt t \lt t^*)=C\%\) for a \(t\)-distribution with \(n-1\) degrees of freedom. 
+
+
+### Activity 6.2.1. Credit Card Debt. 
+Suppose we wanted to find a 95% confidence interval for the average credit card debt of a student. In a sample of 25 college students, the sample average debt was \(\$375\) with sample standard deviation \(\$85\).
+
+
+(a) Compute the standard error \(SE\).
+```{r}
+n = FIXME
+SE = sd/sqrt(n)
+SE
+```
+
+(b) Compute the degrees of freedom.
+```{r}
+df = n-1
+df
+```
+
+(c) Find \(t^*\) such that for a \(t\)-distribution with the appropriate degrees of freedom, \(P(-t^*\lt t\lt t^*)=0.95\). 
+```{r}
+t_star = qt((1-0.95)/2,df,lower.tail = FALSE)
+t_star
+```
+
+(d) Use Remark 6.2.1 to compute a 95% confidence interval for \(\mu\).
+```{r}
+FIXME - t_star*SE
+FIXME + t_star*SE
+
+```
+
+
+(e) Which one of the following describe this interval?
+
+    1.	95% of student's credit card debt fall within this interval.
+    2.	There is a 95% chance the average student credit card debt falls within this window.
+    3.	95% of students have credit card debt.
+
+### Activity 6.2.2. Average Housing Price in Ames, IA. 
+We examine confidence intervals for the average housing price in Ames, IA.
+Run the following code to download the ames.csv data set which contains information of houses in Ames, Iowa, and to see it's variable names: 
+```{r}
+ames = read.csv("https://github.com/TienChih/tbil-stats/raw/main/data/ames.csv")
+
+names(ames)
+```
+
+Click here to learn more about this data set: https://www.openintro.org/data/index.php?data=ames.
+
+(a)  Suppose we wanted to take samples of `n=50` houses to determine a confidence interval. Find \(t^*\)so that for a \(t\)-distribution with 49 degrees of freedom, we have: \(P(-t^*\lt t\lt t^*)=0.95\). 
+```{r}
+t_star = qt((1-0.95)/2, FIXME,lower.tail = FALSE)
+```
+
+(b) Run the following code to take a sample of size n=50 houses from ames and display their price. 
+```{r}
+n=50
+index = sample(1:nrow(ames), n)
+samp=ames[index,]
+samp$price
+```
+
+(c) Run the following code to display the sample mean and standard deviation for this sample. 
+```{r}
+print(mean(samp$price))
+print(sd(samp$price))
+
+```
+
+(d) Use the sample mean \(\bar{x}\),  sample standard deviation \(s\),  sample size \(n\) and \(t^*\) to compute a 95% confidence interval for the average housing price of Ames, IA.
+```{r}
+mean(samp$price) - t_star*FIXME/sqrt(FIXME)
+mean(samp$price) + t_star*FIXME/sqrt(FIXME)
+```
+
+(e) Explain the meaning of your confidence interval in a complete sentence within the context of this problem.
+
+>
+
+
+(f) Run the following code, to compute a 95% confidence interval for the average housing price of Ames, IA. How does it compare to what you found in (d)? 
+```{r}
+t.test(samp$price, conf.level=0.95)$conf.int
+```
+
+(g) Run the following code, to compute the actual average housing price of Ames, IA. Does it fall within your interval? 
+```{r}
+mean(ames$price)
+```
+
+(h) Fix and run the following code to, for 100 times, sample 50 homes and construct a 95% confidence interval based on the results. Let tstar=\(t^*\). 
+
+```{r}
+numsamp=100
+  mu=mean(ames$price)
+
+  samp_mean = rep(NA, numsamp)
+  samp_SE = rep(NA, numsamp)
+  color_vec=rep(NA, numsamp)
+
+for(i in 1:numsamp){
+samp = sample(ames$price, n) # obtain a sample of size n  from the population
+samp_mean[i] = mean(samp)    # Find the mean for this sample
+samp_SE[i] = sd(samp)/sqrt(n) # Find the standard error
+}
+lower_vector = samp_mean - t_star * samp_SE
+upper_vector = samp_mean + t_star * samp_SE
+
+for (j in 1:numsamp){
+  color_vec[j]="red"
+  if(mu>=lower_vector[j] & upper_vector[j]>=mu){color_vec[j]="blue"}
+}
+plot(c(min(lower_vector),max(upper_vector)), c(0, 1 + numsamp), type = "n")
+for (i in 1:numsamp) lines( c(lower_vector[i], upper_vector[i]),c(i, i), lwd = 2, col=color_vec[i], add=TRUE)
+abline(v = mu, lwd = 2, lty = 2)
+```
+
+How many of these intervals do not contain the average housing price? Is this suprising?
+
+>
+
+## Subsection 6.2.2 Hypothesis Testing with a Single Numerical Variable 
+
+### Exploration 6.2.3. Running Times. 
+
+In 2020, the average finishing time of a race was 95 minutes. The race organizer believes that in 2021, the average finishing time will be less. They sample 20 random runners from the 2021 race and their finishing times in minutes were:
+
+88, 99, 9, 72, 77, 64, 93, 87, 72, 93, 80, 117, 101, 106, 87, 60, 90, 85, 61, 111
+
+(a) What is the sample size \(n\),  mean \(\bar{x}\),  and standard deviation \(s\) of this distribution?
+```{r}
+race = c(FIXME)
+
+```
+
+(b) What is the standard error \(SE\) for this distribution? (Recall Theorem 6.1.2)
+```{r}
+SE = mean(race)/sqrt(length(race))
+SE
+```
+
+(c) Suppose hypothetically that the average finishing time had not changed, so \(\mu=95\). Find \(t_{\bar{x}}\),  the \(t\)-score for \(\bar{x}\). (Recall ### Activity 6.1.5)
+```{r}
+t_xbar = (FIXME - 95)/SE
+t_xbar
+
+```
+
+(d) Find the probability that, if the average finishing time had not changed, that you could sample 20 runners and have an average running speed of \(\bar{x}\) or lower by computing \(P(t\lt t_{\bar{x}})\) for a \(t\)-distribution with the appropriate degrees of freedom. 
+```{r}
+pt(t_xbar, 20-1, lower.tail = TRUE)
+```
+
+(e) Is it plausible that the average finishing time could still be 95 minutes?
+
+>
+
+### Remark 6.2.3. Numerical Hypothesis Testing. 
+
+Hypothesis Testing for a numerical variable follows similarly from how it does for categorical variables as seen in Section 4.3. There is a random numerical variable with unknown true mean \(\mu\),  that we want to say something about, and we gather data to reject or fail to reject a null hypothesis.
+
+When doing numerical hypothesis testing, there are three types of Alternative Hypothesis:
+
+*  \(\displaystyle H_A: \mu\neq \mu_0\)
+*  \(\displaystyle H_A: \mu>\mu_0\)
+*  \(\displaystyle H_A: \mu\lt \mu_0\)
+
+Corresponding to “the true mean is (not equal to/greater than/less than) \(\mu_0\)” for some value \(\mu_0\).
+
+In all of these cases, the Null Hypothesis will be: \(H_A: \mu=\mu_0\),  that is, the true mean could be \(\mu_0\).
+
+Then as before, we're given a sample from which we can compute a sample mean, \(\bar{x}\),  standard deviation \(s\) and sample size \(n\). We then compute a \(p\)-value for the alternative hypothesis. The \(p\)-value still represent: “The probability that if we were to assume the null hypothesis, that we could observe values as or more extremal than the sample.”
+
+The way \(p\)-values are computed depends on the form of the alternative hypothesis:
+
+*  If \(H_A\) is of the form \(\mu>\mu_0\) then allowing \(X\) to be the \(t\)-variable with mean \(\mu_0\),  standard deviation \(SE=\frac{s}{\sqrt{n}}\) and \(n-1\) degrees of fredom, the \(p\)-value is
+$p\text{-value}=P(X>\mu_0).$ 
+ 
+
+*  If \(H_A\) is of the form \(\mu\neq \mu_0\) then things are more complicated. We still let \(X\) be the \(t\)-variable with mean \(\mu_0\),  standard deviation \(SE=\frac{s}{\sqrt{n}}\) and \(n-1\) degrees of freedom. But in this case, extremal means at least as far to the left or the right of \(\mu_0\). So we can compute the \(p\)-value via
+$p\text{-value}=P(|X-\mu_0|> |\bar{x}-\mu_0|)=P(X>\mu_0+|\mu_0-\bar{x}|)+P(X\lt \mu_0-|\mu_0-\bar{x}|).$ 
+ 
+It's also worth noting that for either of these tails, \(P(X>\mu_0+|\bar{x}-\mu_0|)=P(X\lt \mu_0-|\bar{x}-\mu_0|)\) and \(P(t> |t_{\bar{x}}|)=P(t\lt -|t_{\bar{x}}|)\). So if you find one of these tails, you can double it to find the sum of both tails.
+
+### Activity 6.2.4. Time on Social Media. 
+
+A researcher believes adults spend on average 2 hours and 20 minutes a day on social media. Their colleague disagrees. They survey 100 adults, and found a sample mean of 2 hours and 17 minutes, with standard deviation 23.5 minutes. Suppose we had a level of significance \(\alpha=0.1\).
+
+(a) Which of the following best describes the null hypothesis \(H_0\text{?}\)
+
+*  \(\mu\lt 140\) minutes.
+*  \(\mu> 140\) minutes.
+*  \(\mu\neq 140\) minutes.
+*  \(\mu= 140\) minutes.
+(b) Which of the following best describes the alternative hypothesis \(H_A\text{?}\)
+*  \(\mu\lt 140\) minutes.
+*  \(\mu> 140\) minutes.
+*  \(\mu\neq 140\) minutes.
+*  \(\mu= 140\) minutes.
+(c)
+Find the standard error \(SE\).
+```{r}
+
+```
+
+(d)
+Find \(t\)-score for \(\bar{x}\).
+```{r}
+
+```
+
+(e)
+Compute a \(p\)-value (be sure to use the appropriate level of significance). 
+```{r}
+
+```
+
+
+(f)
+State the meaning of the \(p\)-value within the context of this problem in a complete sentence.
+
+>
+
+(g)
+Do we reject the null hypothesis?
+
+>
+
+(h)
+What sort of error could have been made? (Type 1 or Type 2)
+
+>
+
+
+### Activity 6.2.5. Restaurant Bill. 
+Our recurring restaurateur believes that the average amount spent by customers is over $12. She plans on polling 50 customers to test this. Suppose we had a level of significance \(\alpha=0.05\).
+
+(a)
+Which of the following best describes the null hypothesis \(H_0\text{?}\)
+*  \(\mu\lt \$12\).
+*  \(\mu> \$12\).
+*  \(\mu\neq \$12\).
+*  \(\mu= \$12\).
+
+(b)
+Which of the following best describes the alternative hypothesis \(H_A\text{?}\)
+*  \(\mu\lt \$12\).
+*  \(\mu> \$12\).
+*  \(\mu\neq \$12\).
+*  \(\mu= \$12\).
+
+(c)
+Let's poll some customers! Run the following code to poll 50 customers and how much money they spent. 
+```{r}
+n=50
+mu=runif(1, 10, 15)
+samp=round(rnorm(n, mu, 4), digits=2)
+```
+
+(d)
+Run the following code to find the sample mean and sample standard deviation. 
+```{r}
+print(mean(samp))
+print(sd(samp))
+```
+
+(e)
+Find the standard error \(SE\).
+```{r}
+
+```
+
+(f)
+Find \(t\)-score for \(\bar{x}\).
+```{r}
+
+```
+
+(g)
+Compute a \(p\)-value (be sure to use the appropriate level of significance). 
+```{r}
+
+```
+
+(h)
+State the meaning of the \(p\)-value within the context of this problem in a complete sentence.
+
+>
+
+(i)
+Do we reject the null hypothesis?
+
+>
+
+(j)
+What sort of error could have been made? (Type 1 or Type 2)
+
+>
+
+(k)
+Run the following to see what the true mean was: 
+```{r}
+print(mu)
+```
+
+(l)
+Run the following to compute the \(p\)-value another way, how does this compare to what you did in (f)? 
+```{r}
+t.test(samp, mu=12, alternative="greater")
+```
+
+### Activity 6.2.6. Using R to Hypothesis Test. 
+
+As in ### Activity 4.3.10, we can use R to Hypothesis Test Directly. The structure of the command is t.test(data, mu=mu_0, alternative="greater, less, two.sided" depending on H_A)
+
+(a)
+Suppose we wanted to know if the average number of chocolate donuts sold by a shop per day is more than 55 chocolate donuts \((H_A:\mu>55)\). We sample 12 random days and the number of chocolate donuts sold were
+
+ 55, 59, 59, 56, 55, 58, 53, 59, 50, 51, 60, 51. 
+Run the following code to obtain the \(p\)-value:
+```{r}
+t.test(c(55, 59, 59, 56, 55, 58, 53, 59, 50, 51, 60, 51), mu=55, alternative="greater")
+```
+
+(b)
+Suppose we wanted to know if the average number of donuts with filling sold by a shop per day is less than 100 donuts \((H_A:\mu\lt 100)\). We sample 10 random days and the number of donuts with filling sold were
+$55, 59, 59, 56, 55, 58, 53, 59, 50, 51, 60, 51.$ 
+Run the following code to obtain the \(p\)-value: 
+```{r}
+t.test(c(83, 83, 112, 108, 99, 104, 107, 113, 101, 107), mu=100, alternative="less")
+```
+
+(c)
+Suppose we wanted to know if the average number of sprinkled donuts sold per day was or wasn't 120 \((H_A:\mu\neq120)\). We sample 16 random days and the number of sprinkled donuts sold were
+$139, 101, 131, 122, 136, 123, 129, 127, 106, 109, 101, 117, 120, 136, 109, 124.$ 
+Run the following code to obtain the \(p\)-value: 
+```{r}
+t.test(c(139, 101, 131, 122, 136, 123, 129, 127, 106, 109, 101, 117, 120, 136, 109, 124), mu=120, alternative="two.sided")
+```
+
+### Activity 6.2.7. Miles per Gallon of a Prius. 
+
+According to Business Insider, the average gas mileage of a car sold in America is 25 miles per gallon. One would hope that a hybrid car such a Prius would get better gas mileage. In fact it's plausible a hybrid car could get over 100 miles per gallon. Data is collected on 19 Prius drivers to see if Prius's have better than 100 mpg gas mileage on average.
+
+Run the following code to download the `prius_mpg.csv` data set which contains information about 19 Prius drivers, and display the variables: 
+```{r}
+prius = read.csv("https://github.com/TienChih/tbil-stats/raw/main/data/prius_mpg.csv")
+
+names(prius)
+```
+
+Click here to learn more about this data set: https://www.openintro.org/data/index.php?data=prius_mpg.
+
+(a)
+Which of the following best describes the null hypothesis \(H_0\text{?}\)
+*  \(\mu\lt 100\) mpg.
+*  \(\mu> 100\) mpg.
+*  \(\mu\neq 100\) mpg.
+*  \(\mu= 100\) mpg.
+
+(b)
+Which of the following best describes the alternative hypothesis \(H_A\text{?}\)
+*  \(\mu\lt 100\) mpg.
+*  \(\mu> 100\) mpg.
+*  \(\mu\neq 100\) mpg.
+*  \(\mu= 100\) mpg.
+
+(c)
+Run the following code to display a histogram of the mpg of the 19 drivers, including a line indicating 100 mpg: 
+Based on this graphic, do we think the null hypothesis is plausible?
+```{r}
+hist(prius$average_mpg)
+abline(v = 100, col="red", lwd=3, lty=2)
+```
+
+(d)
+Run the following code to find the sample mean and sample standard deviation. 
+```{r}
+print(mean(prius$average_mpg))
+print(sd(prius$average_mpg))
+```
+
+(e)
+Find the standard error \(SE\).
+```{r}
+
+```
+
+(f) Run the following to compute the \(p\)-value. 
+```{r}
+t.test(prius$average_mpg, mu=100, alternative= FIXME)
+```
+
+
+(g) Find \(t\)-score for \(\bar{x}\).
+```{r}
+
+```
+
+(h)
+Find the \(p\)-value. 
+```{r}
+
+```
+
+
+(h)
+State the meaning of the \(p\)-value within the context of this problem in a complete sentence.
+
+>
+
+(i)
+Do we reject the null hypothesis?
+
+>
+
+(j)
+What sort of error could have been made? (Type 1 or Type 2)
+
+>
+

@@ -1,0 +1,464 @@
+---
+title: "Section 6.4 Comparing Two Numerical Variables (N4)"
+output: html_notebook
+---
+
+In Section 5.2 we compared two categorical variables to each other. In this section, we compare two numerical variables.
+
+### Exploration 6.4.1. Birth Weight and Smoking. 
+We are interested in seeing whether or not there is any difference in the average birth of weight of babies whose mothers smoked versus those that do not.
+
+Run the following code to download the `ncbirths.csv` data set which contains information about 1000 births recorded in North Carolina, and display the variables: 
+```{r}
+ncbirths = read.csv("https://github.com/TienChih/tbil-stats/raw/main/data/ncbirths.csv")
+
+names(ncbirths)
+```
+
+Click here to learn more about this data set: https://www.openintro.org/data/index.php?data=ncbirths.
+
+(a)
+Run the following code to subset out the babies whose mothers smoked and summarize the data: 
+```{r}
+babysmoke=subset(ncbirths, ncbirths$habit=="smoker")
+summary(babysmoke)
+```
+
+(b)
+Run the following code to subset out the babies whose mothers did not smoke and summarize the data: 
+```{r}
+babynosmoke=subset(ncbirths, ncbirths$habit=="nonsmoker")
+summary(babynosmoke)
+```
+
+(c)
+Run the following code to display overlapping histograms of the birth weights of babies whose mothers smoked and didn't, and the average of each sample: 
+```{r}
+hist(babynosmoke$weight, col=rgb(0,0,1,0.5))
+hist(babysmoke$weight, col=rgb(1,0,0,0.5), add=TRUE)
+abline(v = mean(babysmoke$weight), col="red", lwd=3, lty=2)
+abline(v = mean(babynosmoke$weight), col="blue", lwd=3, lty=2)
+```
+
+(d)
+Run the following code to display overlapping histograms scaled by the size of the samples: 
+```{r}
+hist(babynosmoke$weight, col=rgb(0,0,1,0.5), prob=TRUE)
+hist(babysmoke$weight, col=rgb(1,0,0,0.5), add=TRUE, prob=TRUE)
+abline(v = mean(babysmoke$weight), col="red", lwd=3, lty=2)
+abline(v = mean(babynosmoke$weight), col="blue", lwd=3, lty=2)
+```
+
+### Exploration 6.4.2. Differences in Samples. 
+
+In Exploration 6.4.1, we saw that there was an observable difference in the average baby weights of the samples. We also saw a wide variety of baby weights and quite a bit of overlap. The question is are the distributions from which the samples come identical or not?
+
+(a)
+If two distributions have different means, we'd expect differences in the observed samples. Run the following code to generate histograms for two samples of size 30, one from a normal distribution with mean 10, one from a normal distribution with mean 12, and draw lines indicating their means. 
+```{r}
+samp1=rnorm(30, 10, 3)
+samp2=rnorm(30, 12, 3)
+
+hist(samp1, col=rgb(1,0,0,0.5), prob=TRUE)
+hist(samp2, col=rgb(0,0,1,0.5), add=TRUE, prob=TRUE)
+abline(v = mean(samp1), col="red", lwd=3, lty=2)
+abline(v = mean(samp2), col="blue", lwd=3, lty=2)
+```
+
+Run it a few times to see different samples.
+(b)
+If two distributions have the same mean, we'd still expect differences in the observed samples! Run the following code to generate histograms for two samples of size 30, both from a normal distribution with mean 10 and draw lines indicating their means. 
+```{r}
+samp1=rnorm(30, 10, 3)
+samp2=rnorm(30, 10, 3)
+
+hist(samp1, col=rgb(1,0,0,0.5), prob=TRUE)
+hist(samp2, col=rgb(0,0,1,0.5), add=TRUE, prob=TRUE)
+abline(v = mean(samp1), col="red", lwd=3, lty=2)
+abline(v = mean(samp2), col="blue", lwd=3, lty=2)
+```
+
+Run it a few times to see different samples.
+
+So, if we're given two samples as in Exploration 6.4.1, how are we to tell if this indicates an actual difference in population means? \(p\)-values of course!
+
+## Subsection 6.4.1 Differences in Numerical Variables 
+
+### Activity 6.4.3. Shopping and Spending. 
+
+Suppose that customers at department store A spend on average \(\mu_A=\$350\) in a trip with standard deviation \(\sigma_A=\$75\). Customers who shop at department store B spend on average \(\mu_B=\$200\) in a trip with standard deviation \(\sigma_B=\$40\).
+Consider the random variable \(X\) we get by taking a sample of 50 customers from store A, 30 customers from store B, taking the average spending by the A customers, and from that subtract the average spending from the B customers.
+
+(a)
+The average amount spent by 50 A customers is a random variable. Use Theorem 6.1.2 to find the mean \(\mu_{\bar{a}}\) and standard error \(SE_{\bar{a}}\) for this variable.
+```{r}
+sigma_A = FIXME
+n_A = FIXME
+SE_A = sigma/sqrt(n)
+SE_A
+```
+
+(b)
+The average amount spent by 30 B customers is a random variable. Use Theorem 6.1.2 to find the mean \(\mu_{\bar{b}}\) and standard error \(SE_{\bar{b}}\) for this variable.
+```{r}
+sigma_B = FIXME
+n_B = FIXME
+SE_B = sigma/sqrt(n)
+SE_B
+```
+
+(c)
+Recall that the variance of a random variable is the square of its standard deviations. Find the variance for each of the two sampling variables.
+```{r}
+var_A = SE_A^2
+var_A
+var_B = FIXME^2
+var_B
+```
+
+(d)
+Let \(D\) denote the difference between the sampling distributions. Use Remark 2.5.1 to find \(\mu_D\).
+```{r}
+mu_D = FIXME - FIXME2
+```
+
+(e)
+Use Remark 2.5.1 to find the variance of \(D\text{:}\) \(Var_D\).
+```{r}
+var_D = FIXME + FIXME2
+```
+
+(f)
+Find the standard deviation of \(D\text{:}\) \(SE_D=\sqrt{Var_D}\).
+```{r}
+SE_D = sqrt(var_D)
+```
+
+(g) Run the following code to simulate 1000 trials of sampling 50 customers from store A, 30 customers of store B, taking the difference in their average spending, and plotting a histogram of the results. 
+```{r}
+storeA=50
+storeB=30
+Amean=350
+Asd=75
+Bmean=200
+Bsd=40
+trials=1000
+
+diff_spending=rep(NA, trials)
+
+for(i in 1:trials){
+  A_samp=rnorm(storeA, Amean, Asd)
+  B_samp=rnorm(storeB, Bmean, Bsd)
+  diff_spending[i]=mean(A_samp)-mean(B_samp)
+}
+hist(diff_spending, breaks=25, prob=TRUE)
+```
+
+(h)Fix and run the following code so that mu_D=\(\mu_D\) and SE_D=\(\sigma_D\) and plot a normal curve on top of our histogram. 
+```{r}
+mu_D=FIXME
+SE_D=FIXME
+
+hist(diff_spending, breaks=25, prob=TRUE)
+curve(dnorm(x, mean=mu_D, sd=SE_D), col="darkblue", lwd=2, add=TRUE, yaxt="n")
+```
+
+How well does the normal distribution approximate the histogram?
+
+
+### Remark 6.4.1. Difference of Means. 
+
+Let there be two random numerical variables, with population means \(, \mu_1, \mu_2\) and standard deviations \(\sigma_1. \sigma_2\). Then let \(D\) be the random variable generated by taking random samples of size \(n_1, n_2\) of the two variables and taking the difference in their proportions. Then \(D\) is approximated by a normal variable with mean and standard deviation:
+\begin{equation*} \mu_D=\mu_1-\mu_2, SE_D=\sqrt{\frac{\sigma_1^2}{n_1}+\frac{\sigma_2^2}{n_2}}. \end{equation*} 
+When using sample standard deviations \(s_1, s_2\) to estimate \(\sigma_1, \sigma_2\) we use a \(t\)-distribution with degrees of freedom: \(\min(n_1, n_2)-1\).
+
+## Subsection 6.4.2 Confidence Intervals 
+
+### Remark 6.4.2. 
+
+As in Remark 6.2.1, given samples of two numerical variables, of sizes \(n_1, n_2\) with sample means \(\bar{x}_1, \bar{x}_2\) and standard deviations \(s_1, s_2\), we can find a C% confidence interval for the difference of population means \(\mu_1-\mu_2\) by
+\begin{equation*} [(\bar{x}_1-\bar{x}_2)-t^*SE_D, (\bar{x}_1-\bar{x}_2)+t^*SE_D] \end{equation*} 
+where \(SE_D=\sqrt{\frac{s_1^2}{n_1}+\frac{s_2^2}{n_2}}\) as in Remark 6.4.1, and \(t^*\) is the \(t\) value so that \(P(-t^*\lt t \lt t^*)=C\%\) for a \(t\)-distribution with \(\min(n_1, n_2)-1\) degrees of freedom.
+Note that other techniques to do compute confidence intervals utilize a more complicated method to determine degrees of freedom. We use this method for hand computations as its straightforward and still a good approximation.
+
+### Activity 6.4.4. Stopping Distance. 
+A automotive manufacturer tests two types of brakes for its mid-sized SUV's. In a sample of 30 SUV's with type A breaks, the stopping distance when breaks are applied at 60 mph was found to be 127.43 ft with standard deviation 5.24 feet. In a separate sample of 30 SUV's using type B breaks, the average stopping distance was 120.45 feet with standard deviation 4.37 feet.
+
+We want to find a 95% confidence interval for the difference in stopping distance between the breaks.
+
+(a)
+Compute the the difference in sample means \(\bar{x}_1-\bar{x}_2\).
+```{r}
+n_A = 33
+barx_A = 22.886
+sd_A = 7.611
+
+n_B = 33
+barx_B = 15.525
+sd_B = 5.767
+```
+
+(b)
+Compute the standard error \(SE_D\) for the difference in means using Remark
+6.4.1.
+```{r}
+SE_D = sqrt(sd_A^2/n_A + sd_B^2/n_B)
+```
+
+(c)
+Compute the degrees of freedom.
+```{r}
+df = min(n_A, n_B)-1
+df
+```
+
+(d)
+Find \(t^*\) such that for a \(t\)-distribution with the appropriate degrees of freedom, \(P(-t^*\lt t\lt t^*)=0.95\). 
+```{r}
+tstar = qt((1-0.95)/2, df, lower.tail = FALSE)
+tstar
+
+t = ((barx_A - barx_B)-10)/SE_D
+t
+```
+
+(e)
+Use Remark 6.4.2 to compute a 95% confidence interval for \(\mu\).
+```{r}
+(barx_A-barx_B) - tstar*SE_D
+(barx_A-barx_B) + tstar*SE_D
+pt(t,df, lower.tail = TRUE)*2
+
+```
+
+(f)
+State what this confidence interval means in the context of this problem using complete sentences.
+
+
+### Activity 6.4.5. Beef Sandwiches. 
+Our reoccurring restaurateur is back and wants to know what the difference is, if any, in the amount of Roast Beef Sandwiches sold each lunch rush in her East and West locations. She takes a sample of 30 lunch rushes in the East Location and 45 in the West.
+
+(a)
+Run the following code to sample 30 lunch rushes in the east location, display a histogram of the results, and show the mean and standard deviation. 
+```{r}
+eastlunch=30
+east_mu=runif(1,30,50)
+
+east_samp=round(rnorm(eastlunch, east_mu, 8))
+hist(east_samp, col="red")
+print(mean(east_samp))
+print(sd(east_samp))
+```
+
+(b)
+Run the following code to sample 45 lunch rushes in the 34st location, display a histogram of the results, and show the mean and standard deviation. 
+```{r}
+westlunch=45
+west_mu=runif(1,30,50)
+
+west_samp=round(rnorm(westlunch, west_mu, 8))
+hist(west_samp, col="blue")
+print(mean(west_samp))
+print(sd(west_samp))
+```
+
+(c)
+Run the following code to display the two histograms side by side, scaled for sample size, and with the means displayed, as well as side by side box plots. 
+```{r}
+hist(east_samp, col=rgb(1,0,0,0.5), prob=TRUE)
+hist(west_samp, col=rgb(0,0,1,0.5), prob=TRUE, add=TRUE)
+abline(v = mean(east_samp), col="red", lwd=3, lty=2)
+abline(v = mean(west_samp), col="blue", lwd=3, lty=2)
+
+boxplot(east_samp, west_samp)
+```
+
+(d)
+Compute the the difference in sample means \(\bar{x}_1-\bar{x}_2\).
+```{r}
+mean(east_samp) - mean(west_samp)
+```
+
+(e)
+Compute the standard error \(SE_D\) for the difference in means using Remark 6.4.1.
+```{r}
+SE_D = sqrt(sd(east_samp)^2/eastlunch + FIXME^2/FIXME)
+SE_D
+```
+
+(f)
+Compute the degrees of freedom.
+```{r}
+df = min(eastlunch, westlunch)-1
+```
+
+(g)
+Find \(t^*\) such that for a \(t\)-distribution with the appropriate degrees of freedom, \(P(-t^*\lt t\lt t^*)=0.95\). 
+```{r}
+tstar = qt(1-(1-0.95)/2, df, lower.tail = FALSE)
+tstar
+```
+
+(h)
+Use Remark 6.4.2 to compute a 95% confidence interval for \(\mu\).
+```{r}
+(mean(east_samp) - mean(west_samp)) - tstar*SE_D
+(mean(east_samp) - mean(west_samp)) + tstar*SE_D
+```
+
+(i)
+State what this confidence interval means in the context of this problem using complete sentences.
+
+(j)
+Run the following code to display the actual differences of means. 
+```{r}
+east_mu-west_mu
+```
+
+(k)
+Run the following code to compute a 95% confidence interval through R.
+```{r}
+t.test(east_samp, west_samp, conf.level=0.95)$conf.int
+```
+
+Note this should give you a different interval than what you found in (h) if you did it by hand. 
+
+## Subsection 6.4.3 Hypothesis Testing 
+
+### Remark 6.4.3. 
+
+We can test the difference between means of numerical variables, similar to how we tested difference of proportions in Remark 5.2.6. Given two numerical variables with population means \(\mu_1, \mu_2\) we have alternative Hypothesis in the forms:
+*  \(\displaystyle H_A: \mu_1-\mu_2>\mu_0.\)
+*  \(\displaystyle H_A: \mu_1-\mu_2\lt\mu_0.\)
+*  \(\displaystyle H_A: \mu_1-\mu_2\neq\mu_0.\)
+The null hypothesis for these is H_0: \mu_1-\mu_2=\mu_0.
+We find \(p\)-values in much the same way as in Remark 6.2.3. We assume the null hypothesis, and let \(D\) be the sampling distribution of the differences of the means of two samples, sizes \(n_1, n_2\). Then \(D\) would have mean \(\mu_1-\mu_2\) and standard deviation
+\begin{equation*} SE_D=\sqrt{\frac{s_1^2}{n_1}+\frac{s_2^2}{n_2}} \end{equation*} 
+as in Remark 6.4.1, and \(t^*\) is the \(t\) value so that \(P(-t^*\lt t \lt t^*)=C\%\) for a \(t\)-distribution with \(\min(n_1, n_2)-1\) degrees of freedom (again a simplified heuristic).
+Then based on the alternative hypothesis, we compute the tail area(s) exactly as we would in Remark 5.2.6.
+
+### Activity 6.4.6. Cow Feed. 
+
+Dairy farmers wish to test a new type of diets for dairy cows, with the hope that the new diet will increase milk yields. 20 cows are fed the traditional diet and 15 the experimental diet. The cows are observed over a 4 week period, and the average daily milk yield and sample standard deviations for both groups are recorded in Liters.
+
+|     Diet     	|  n 	| $\bar x$ 	|   s  	|
+|:------------:	|:--:	|:--------:	|:----:	|
+|   Standard   	| 20 	|   42.3   	| 8.73 	|
+| Experimental 	| 15 	|   45.1   	| 6.24 	|
+
+Let \(\mu_1\) denote the true mean of milk production for cows on the standard diet, and \(\mu_2\) denote the true mean of milk production for cows on the experimental diet.
+
+(a)
+Which of the following best describes the null hypothesis \(H_0\text{?}\)
+*  \(\mu_1-\mu_2\lt 0\) liters.
+*  \(\mu_1-\mu_2> 0\) liters.
+*  \(\mu_1-\mu_2\neq 0\) liters.
+*  \(\mu_1-\mu_2= 0\) liters.
+
+(b)
+Which of the following best describes the alternative hypothesis \(H_A\text{?}\)
+*  \(\mu_1-\mu_2\lt 0\) liters.
+*  \(\mu_1-\mu_2> 0\) liters.
+*  \(\mu_1-\mu_2\neq 0\) liters.
+*  \(\mu_1-\mu_2= 0\) liters.
+
+(c)
+Find the standard error \(SE\).
+```{r}
+
+```
+
+(d)
+Find \(t\)-score for \(\bar{x_1}-\bar{x_2}\).
+```{r}
+
+```
+
+(e)
+Compute a \(p\)-value (be sure to use the appropriate level of significance). 
+```{r}
+
+```
+
+(f)
+State the meaning of the \(p\)-value within the context of this problem in a complete sentence.
+
+(g)
+Do we reject the null hypothesis?
+
+(h)
+What sort of error could have been made? (Type 1 or Type 2)
+
+### Activity 6.4.7. Birth Weight and Smoking revisted. 
+
+Recall that in Exploration 6.4.1 we separated the sampling of births in North Carolina into `babysmoke` and `babynosmoke`. We were curious as to whether or not there was any difference in average birth weights between babies born to mothers who smoked compared to those who did not.
+
+Run the following code to plot side by side box plots of the birth weights of babies born to mothers who smoked versus didn't smoke: 
+```{r}
+boxplot(ncbirths$weight~ncbirths$habit)
+```
+
+(a)
+Which of the following best describes the null hypothesis \(H_0\text{?}\)
+*  \(\mu_1-\mu_2\lt 0\) pounds.
+*  \(\mu_1-\mu_2> 0\) pounds.
+*  \(\mu_1-\mu_2\neq 0\) pounds.
+*  \(\mu_1-\mu_2= 0\) pounds.
+
+(b)
+Which of the following best describes the alternative hypothesis \(H_A\text{?}\)
+*  \(\mu_1-\mu_2\lt 0\) pounds.
+*  \(\mu_1-\mu_2> 0\) pounds.
+*  \(\mu_1-\mu_2\neq 0\) pounds.
+*  \(\mu_1-\mu_2= 0\) pounds.
+
+(c)
+Run the following code to show the sample size, sample mean and sample standard deviation of baby weights of mothers who smoked: 
+```{r}
+print(length(babysmoke$weight))
+print(mean(babysmoke$weight))
+print(sd(babysmoke$weight))
+```
+
+(d)
+Run the following code to show the sample size, sample mean and sample standard deviation of baby weights of mothers who did not smoke: 
+```{r}
+print(length(babynosmoke$weight))
+print(mean(babynosmoke$weight))
+print(sd(babynosmoke$weight))
+```
+
+(e)
+Find the standard error \(SE\).\
+```{r}
+
+```
+
+(f)
+Find \(t\)-score for \(\bar{x_1}-\bar{x_2}\).
+```{r}
+
+```
+
+(g)
+Compute a \(p\)-value (be sure to use the appropriate level of significance). 
+```{r}
+
+```
+
+(h)
+State the meaning of the \(p\)-value within the context of this problem in a complete sentence.
+
+(i)
+Do we reject the null hypothesis?
+
+(j)
+What sort of error could have been made? (Type 1 or Type 2)
+
+(k)
+Run the following code to compute the \(p\)-value directly with R: 
+```{r}
+t.test(babysmoke, babynosmoke, alternative="two.sided", mu=0)
+```
+
+Note that the computation should produce a slightly different but very close value.

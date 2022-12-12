@@ -1,0 +1,300 @@
+---
+title: "7.3 Inference and Linear Regression (R3)"
+author: ""
+output: html_notebook
+---
+
+The slope and vertical intercept, $\beta_1, \beta_0$ we computed in Section 7.2 are determined by a sample of (pairs of) random variables, and as such, are merely point estimates of these parameters. As usual, there is some chance we chose non-representative data from the sample.
+In this section, we use our sample data to make inferences on the true parameters.
+
+### Exploration 7.3.1. Estimating Regression. 
+
+Let X and Y be variables where $Y=0.8X+5+\epsilon$ is a distributed by a normal variable with mean 0 and standard deviation 3.
+
+(a)
+What line probably best fits the relationship between X and Y?
+
+(b)
+Run the following code to generate n=10 random X and Y values, plot them, find a regression line and the line in (a): 
+```{r}
+n=10
+X=runif(n, 0, 10)
+Y=0.8*X+5+rnorm(n,0,3)
+mod=lm(Y~X)
+plot(X, Y, pch=19)
+abline(mod)
+abline(5, 0.8, col="blue", lty=2)
+```
+
+Run it a few times, what do you notice?
+
+(c)
+Adjust n=100 and run it again, now what do you notice?
+
+## Subsection 7.3.1 Hypothesis Testing 
+
+### Remark 7.3.1. 
+
+When it comes to linear regression, we focus on the following pair of hypothesis. :
+
+*  $H_0: \beta_1=0$ or the slope is zero. So changes in the explanatory variable do not result in average change in response variable.
+
+*  $H_0: \beta_1\neq 0$ or the slope is not zero. So changes in the explanatory variable do result in average change in response variable.
+
+This is a numerical hypothesis test similar to what we have done before. However we're not just given a list of slopes to find a sample standard deviation. The computation here is tedious, so we utilize technology to perform them. If one wished to compute the standard error for $\beta_1$ by hand, we do so via:
+
+$SE_1=\sqrt{\frac{1}{n-2}\cdot \frac{\sum (y_i-\hat{y}_i)^2}{\sum(x_i-\bar{x})^2}}$
+
+where $\hat{y}_i=\beta_1\cdot x_i+\beta_0$, or the value of $y$ predicted by the linear model.
+
+### Exploration 7.3.2. Hypothesis Testing: Slope - Possums. 
+
+Run the following code to download `possum.csv` as seen in Exploration 7.1.1, Activity 7.1.7, and Exploration 7.2.1, and create a linear model for `head_l~skull_w` and summarize it. 
+```{r}
+possum = read.csv("https://github.com/TienChih/tbil-stats/raw/main/data/possum.csv")
+possummod=lm(head_l~skull_w, data=possum)
+summary(possummod)
+```
+
+We're focused on the `Coefficients`, in particular the second row.
+The first row starting with (`Intercept`) gives the point estimate, standard error, test statistic and $p$-value for the alternative hypothesis $H_A:\beta_0\neq 0$.
+
+The second row starting with `skull_w` gives the point estimate, standard error, test statistic and $p$-value for the alternative hypothesis $H_A:\beta_1\neq 1$. This is the row about slopes.
+
+(a)
+The first entry of this row gives us the point estimate for the slope. How does this compare to slope found by running: 
+```{r}
+possummod
+beta_1 = possummod$coefficients[2]
+```
+
+We call this value $\beta_1$.
+
+(b)
+The second entry of this row gives us the standard error for the slope. Call this value $SE_1$. Find the $t$-value for $\beta_1$ by computing
+$t_1=\frac{\beta_1-0}{SE_1}.$
+```{r}
+SE_1 = sqrt(diag(vcov(possummod)))[2]
+t_1 = (possummod$coefficients[2] - 0)/SE_1
+```
+
+How does this value compare to the third entry?
+
+(c)
+According to the summary, how many degrees of freedom are there?
+```{r}
+df = summary(possummod)$df[2]
+```
+
+(d)
+Compute $P(t>t_1)$ on the standard $t$-distribution with the appropriate degrees of freedom. Then double it to obtain the $p$-value for the alternative hypothesis $H_A: \beta_1\neq 0$. 
+```{r}
+pt(t_1, df, lower.tail = FALSE)*2
+```
+
+
+How does this value compare to the 4th entry?
+
+(e)
+Do we accept or reject the null hypothesis that $H_0: \beta_1=0$?
+
+### Remark 7.3.2. 
+
+The fourth entry of the second Coefficients: row gives the probability that, if the slope was 0, that we would obtain a slope as steep or steeper.
+
+The fourth entry of the first Coefficients: row gives the probability that, if the intercept was 0, that we would obtain an as or more extreme.
+
+## Subsection 7.3.2 Confidence Intervals 
+
+### Remark 7.3.3. 
+
+For $\beta_i$, we compute the C % confidence interval as follows:
+$[\text{point estimate for }\beta_1 - SE_it^*, \text{point estimate for }\beta_1 + SE_it^*]$
+where $t^*$ is the $t$-value such that $P(-t^*\lt t\lt t^*)=C\%$ for the standard $t$-variable with the appropriate degrees of freedom.
+
+### Exploration 7.3.3. Confidence: Intervals:$\beta_i$ - Possums. 
+
+We continue from Exploration 7.3.2.
+
+(a)
+Find a $t^*$ so that $P(-t^*\lt t\lt t^*)=C\%$ for the appropriate degrees of freedom.
+```{r}
+tstar = qt(0.975, df)
+```
+
+(b)
+Use the point estimate and standard error for $\beta_1$, $t^*$ and Remark 7.3.3 to compute a 95% confidence interval for $\beta_1$.
+```{r}
+beta_1 - tstar*SE_1
+beta_1 + tstar*SE_1
+```
+
+(c)
+Explain what this confidence interval means within the context of the problem.
+
+## Subsection 7.3.3 Putting it together 
+
+### Activity 7.3.4. Inference for SP500 companies. 
+
+Run the following code to download `sp500.csv` a data set containing information on a sample of 50 fortune 500 companies and show it's variable names. 
+```{r}
+sp500 = read.csv("https://github.com/TienChih/tbil-stats/raw/main/data/sp500.csv")
+
+names(sp500)
+```
+
+Click here to learn more about this data set: https://www.openintro.org/data/index.php?data=sp500.
+
+(a)
+Run the following to create and summarize a linear model with debt the debt in millions of dollars as the explanatory variable and profit_margin the percent of earnings that is profit as the response variable: 
+```{r}
+sp500mod=lm(profit_margin~debt, data=sp500)
+summary(sp500mod)
+```
+
+(b)
+Run the following to plot profit_margin of these companies against the debt and draw a regression line: 
+```{r}
+plot(sp500$debt, sp500$profit_margin)
+abline(sp500mod, col="red")
+```
+
+(c)
+State what the slope $\beta_1$ means in the context of this problem.
+
+(d)
+Interpret the $p$-value for the alternative hypothesis $H_A:\beta_1\neq 0$ in the context of this problem.
+
+(e)
+Do we reject the null hypothesis that $H_0:\beta_1=0$? What does that say about the relationship between profit margin and debt?
+
+(f)
+Find a $t^*$ so that $P(-t^*\lt t\lt t^*)=C\%$ for the appropriate degrees of freedom.
+```{r}
+tstar = qt(1-(1-0.95)/2, summary(sp500mod)$df[2],lower.tail = TRUE)
+tstar
+```
+
+(g)
+Use the point estimate and standard error for $\beta_1$, $t^*$ and Remark 7.3.3 to compute a 95% confidence interval for $\beta_1$.
+```{r}
+SE_1 = sqrt(diag(vcov(sp500mod)))[2]
+beta_1 = sp500mod$coefficients[2]
+
+beta_1 - tstar*SE_1
+beta_1 + tstar*SE_1
+```
+
+
+(h)
+Explain what this confidence interval means within the context of the problem.
+
+
+### Quiz 6 Activity
+
+Run the following code to enter class data on Chapter 6 Homework totals and Chapter 6 Quiz scores
+```{r}
+Homework = c( 0, 0, 5, 7, 7.38, 40.03, 52.34, 52.84, 58.28, 58.95, 73.29, 73.89, 74.89, 74.94, 80.55, 81.84, 84.39, 84.89, 91.5)
+Quiz = c(8.33, 3.33, 0.21, 6.88, 2.71, 16.04, 6.46, 2.71, 8.33, 17.29, 7.5, 6.67, 9.58, 10.83, 19.79, 17.92, 24.38, 11.88, 23.96)
+
+```
+
+(a)  Create a linear model using homework totals to explain quiz scores.
+```{r}
+quizmod = lm(Quiz ~ Homework)
+```
+
+(b) What can you tell from the summary of the model? 
+
+(c) What percentage of the quiz score is explained by the homework score? 
+
+(d) State what the slope $\beta_1$ means in the context of this problem.
+
+(e) Interpret the $p$-value for the alternative hypothesis $H_A:\beta_1\neq 0$ in the context of this problem.
+
+(f) Do we reject the null hypothesis that $H_0:\beta_1=0$? What does that say about the relationship between profit margin and debt?
+
+(g) Find a $t^*$ so that $P(-t^*\lt t\lt t^*)=C\%$ for the appropriate degrees of freedom.
+```{r}
+tstar = qt(1-(1-0.95)/2, summary(quizmod)$df[2],lower.tail = TRUE)
+tstar
+```
+
+(h) Use the point estimate and standard error for $\beta_1$, $t^*$ and Remark 7.3.3 to compute a 95% confidence interval for $\beta_1$.
+```{r}
+SE_1 = sqrt(diag(vcov(quizmod)))[2]
+beta_1 = quizmod$coefficients[2]
+
+beta_1 - tstar*SE_1
+beta_1 + tstar*SE_1
+```
+
+
+(i) Explain what this confidence interval means within the context of the problem.
+
+(j) Are there any lessons learned from this data?
+
+
+### Activity 7.3.5. Inference for Nutrition and Starbucks. 
+Run the following code to download starbucks.csv a data set containing information about 77 Starbucks menu items their nutritional value and show it's variable names. 
+```{r}
+starbucks = read.csv("https://github.com/TienChih/tbil-stats/raw/main/data/starbucks.csv")
+
+names(starbucks)
+```
+
+Click here to learn more about this data set: https://www.openintro.org/data/index.php?data=starbucks.
+
+(a)
+Run the following to create and summarize a linear model with protein the protein content of an item in g as the explanatory variable and calories the calories of each item measure in, well calories, as the response variable: 
+```{r}
+starbucksmod=lm(calories~protein, data=starbucks)
+summary(starbucksmod)
+```
+
+(b)
+Run the following to plot calories of these items against the protein and draw a regression line: 
+```{r}
+plot(starbucks$protein, starbucks$calories)
+abline(starbucksmod, col="red")
+```
+
+(c)
+State what the slope $\beta_1$ means in the context of this problem.
+```{r}
+beta_1 = starbucksmod$coefficients[2]
+beta_1
+```
+
+(d)
+Interpret the $p$-value for the alternative hypothesis $H_A:\beta_1\neq 0$ in the context of this problem.
+```{r}
+
+```
+
+(e)
+Do we reject the null hypothesis that $H_0:\beta_1=0$? What does that say about the relationship between calories and protein?
+
+(f)
+Find a $t^*$ so that $P(-t^*\lt t\lt t^*)=C\%$ for the appropriate degrees of freedom.
+```{r}
+tstar = qt(1-(1-0.95)/2, summary(FIXME)$df[2],lower.tail = TRUE)
+tstar
+```
+
+(g)
+Use the point estimate and standard error for $\beta_1$, $t^*$ and Remark 7.3.3 to compute a 95% confidence interval for $\beta_1$.
+```{r}
+SE_1 = sqrt(diag(vcov(FIXME)))[2]
+
+beta_1 - tstar*SE_1
+beta_1 + tstar*SE_1
+
+```
+
+
+(h)
+Explain what this confidence interval means within the context of the problem.
+
+(i)
+Repeat this for any other pair of numerical variables.

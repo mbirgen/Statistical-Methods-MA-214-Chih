@@ -1,0 +1,198 @@
+---
+title: "Section 7.1 Linear Correlation of Variables (R1)"
+output: html_notebook
+---
+
+In other math courses, we likely have seen relationships between variables where one can directly compute the value of one variable based on another. For example if we knew the length of a side of a square, we can exactly compute the area of the square.
+Things in statistics are rarely so exact. Nevertheless, we can often identify relationships between variables, and make predictions of one variable based on the values of the other. In this section, we introduce the notion of correlation of variables.
+
+### Exploration 7.1.1. Dimensions of Possums. 
+
+Run the following code to download the `possum.csv` data set which contains information about 104 possums, and various attributes of the possums: 
+```{r}
+possum = read.csv("https://github.com/TienChih/tbil-stats/raw/main/data/possum.csv")
+
+names(possum)
+```
+
+Click here to learn more about this data set: https://www.openintro.org/data/index.php?data=possum.
+
+(a)
+Run the following code to plot the head lengths of the possum (in mm), versus their skull width (in mm). 
+```{r}
+plot(possum$skull_w, possum$head_l, pch=19)
+```
+
+When using the plot command, the first item is the independent variable, `x`. The second item is the possibly dependent variable, `y`.  The `pch` is just telling the plot which symbol to use when plotting the data.
+
+(b)
+If one were to catch two possums, one with a 53mm skull width and one with a 62mm skull width, which one would you predict had a longer head (without measuring)? How confident would you be in your prediction?
+
+(c)
+If you had to guess what the head lengths were for possums with a 53mm and 62mm skull widths, what would they be? How confident would you be in your guesses?
+
+(d)
+If you had to guess what which skull width would give you a head length of 92mm, what would you guess? How confident would you be in your guess?
+
+## Subsection 7.1.1 Linear Fit of Data 
+
+### Remark 7.1.1. 
+
+The central theme of this chapter is finding a linear relationship between variables. In other words, we wish to find a linear equation $y=b_1x+b_0$ that best describes the relationship between the variables. 
+
+> For class, go back to Mentimeter.
+ 
+ 
+Task:  Given a set of data, our goal is to identify a “best” linear relationship between them.
+
+In order for this to be a sensible task to embark on, the underlying variables should actually have a linear relationship, or we should have good reason to think that they have a linear relationship.
+
+*  It's sensible for the monthly profit of a company (with one product) to coincide with how many units they sold, since there is a fixed price per unit.
+*  It is not sensible for the areas of squares to have a linear relationship with the length of sides, since areas are the squares of sides, which gives a quadratic relationship.
+
+### Definition 7.1.9. Correlation Coefficient. 
+
+Given a set of data points $(x_1, y_1), \ldots, (x_n, y_n)$ the correlation coefficient is a statistic $R, -1\leq R\leq 1$ which measures the strength of the linear relationship between $x$ and $y$.
+
+$R=1$ or $-1$ denotes data that is perfectly aligned with a positive or negative sloping line respectively. The sign of $R$ gives you the direction of the relationship: positive or negative. The magnitude or distance from 0 determines the strength of the relationship: weak if close to 0, strong if close to -1 or 1.
+
+
+### Remark 7.1.19. Computing the Correlation Coefficient. 
+$R$ can be computed
+$R=\frac{1}{n-1}\sum\left(\frac{x_i-\bar{x}}{s_x}\right)\left(\frac{y_i-\bar{y}}{s_y}\right) $
+where $\bar{x}, \bar{y}$ are the mean of the $x$ and $y$ variables, and $s_x, s_y$ are the sample standard deviations.
+We won't go through the details of this computation or it's derivation. The main take away is $\left(\frac{x_i-\bar{x}}{s_x}\right), \left(\frac{y_i-\bar{y}}{s_y}\right)$ measures the distance of the data points from their mean, scaled by the deviation. If $x_i$ is above (or below)$\bar{x}$ whenever $y_i$ is above (or below) $\bar{y}$, then these terms are positive and the sum is large and positive. If one is above whenever the other is below, these terms are negative and the sum is large and negative. If it's a mix, then the positive and negative terms cancel and you are close to 0.
+
+### Remark 7.1.20. 
+
+We often square $R\text{:}$ $R^2$, to remove the sign and just to measure the strength of the linear relationship. $R^2$ explains what proportion of the response variable can be explained by the explanatory variable. This can range from $R^2=1$ or 100% of the explanatory variable is explained by the response variable, to $R^2=0$ the explanatory variable has no impact at all on the response variable.
+
+## Subsection 7.1.2 Best Fit Lines 
+
+### Remark 7.1.24. 
+
+Of course, none of these lines perfectly represent all of these points, no line could. There will necessarily be some overshoot and undershoot. We want to find a line that minimizes this.
+
+Given a point in the scatterplot $(x_i, y_i)$, and a line $y=\beta_1x+\beta_0$, let $\hat{y}_i:=\beta_1x_i+\beta_0$. This is the value of $y$ that the line predicts. Call $e_i=y_i-\hat{y}_i$ the residual or error of the line. This is the difference between what the model predicts and the actual value.
+
+Our goal is to minimize
+$\sum e_i^2 $
+the squared some of errors (to remove sign).
+
+### Remark 7.1.25. Finding the regression line. 
+
+The parameters for a least square line can be computed as follows:
+
+*  Recall that the slope of a line is change in $y$ over change in $x$. How much a variable changes (ignoring direction) can roughly be thought of as it's variation. So we have
+$\beta_1=\frac{s_y}{s_x}R. $
+The “change” in $y$ over the “change” in $x$, modified for sign and strength of the relationship.
+*  While we can't expect every data point to lie on this line, we should expect that “on average” that we can predict $y$ with $x$. Thus:
+$ (y-\bar{y})=\beta_1(x-\bar{x})\\ y=\beta_1x-\beta_1\bar{x}+\bar{y}\\ y=\beta_1x+(\bar{y}-\beta_1\bar{x})$.
+Thus:
+$\beta_0=\bar{y}-\beta_1\bar{x}. $
+
+### Activity 7.1.6. Linear Regression and Technology. 
+
+In practice, we use technology to perform linear regression. Let's recall the data from Activity 7.1.5:
+
++---+---+
+| x | y |
++---+---+
+| 1 | 1 |
++---+---+
+| 2 | 3 |
++---+---+
+| 3 | 2 |
++---+---+
+| 4 | 4 |
++---+---+
+| 4 | 5 |
++---+---+
+| 5 | 4 |
++---+---+
+| 6 | 7 |
++---+---+
+```{r}
+x1=c(1,2,3,4,4,5,6)
+y1=c(1,3,2,4,5,4,7)
+
+dummydata = data.frame(x1, y1)
+```
+
+(a)
+Run the following code to create a linear model for this data, and save it as dummymod.
+```{r}
+dummymod=lm(y1~x1, data=dummydata)
+dummymod
+```
+
+
+How do the intercept and the slope compare to the B_1, B_0 from Activity 7.1.5?
+
+(b)
+Run the following code to show the correlation for this model. 
+```{r}
+cor(dummydata$x1, dummydata$y1)
+```
+
+What is the correlation coefficient $R$=r? What does this tell us about the relationship between $y$ and $x$.
+
+(c) We can calculate $R^2$ directly from `dummymod` using the following code:
+```{r}
+summary(dummymod)$r.squared
+```
+
+What is $R^2$? What does this tell us about the relationship between $y$ and $x$ according to Remark 7.1.20.
+
+(d)
+Run the following code to plot the scatterplot and the least squares line. 
+```{r}
+plot(dummydata$x1, dummydata$y1,  pch=19)
+abline(dummymod, col="red")
+```
+
+Activity 7.1.7. Possum Regression. 
+
+We now return to the question from Exploration 7.1.1 and see if we can give a more precise answer.
+
+(a)
+Run the following code to create a linear model for `head_l`, as a function of `skull_w` and save it as `possummod`. 
+```{r}
+possummod=lm(head_l~skull_w, data=possum)
+possummod
+```
+What is the slope and $y$ intercept for the liner model?
+
+
+(b)
+Run the following code to show the correlation for this model. 
+```{r}
+cor(possum$skull_w, possum$head_l)
+```
+
+(c)
+What is $R^2\text{?}$ What proportion of the head length is determined by the skull width. (See Remark 7.1.20.)
+```{r}
+summary(possummod)$r.squared
+```
+
+(d)
+Run the following code to plot the scatterplot and the least squares line. 
+```{r}
+plot(possum$skull_w, possum$head_l,  pch=19)
+abline(possummod, col="red")
+```
+
+(e)
+Run the following code to show a summary of `possummod`. 
+```{r}
+summary(possummod)
+```
+
+(f)
+Run the following code to show a summary of `possum`. 
+```{r}
+summary(possum)
+```
+
+Pick two other numerical variables from `possum` and repeat the above.
